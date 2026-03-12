@@ -1,0 +1,52 @@
+/* FOR LOGIN, REGISTER, PROFILE */
+* { box-sizing: border-box; }
+
+.card {
+  box-shadow: 0 0 15px 10px rgba(0,0,0,0.1);
+  transition: 0.3s;
+  border-radius: 16px; 
+  border: none;
+  width: 40rem;
+  align-items: center;
+  padding: 20px 4px 26px;
+}
+.card-header{
+  padding: 24px 0px 36px;
+  background-color: transparent;
+  border-style: none;
+}
+
+.container {
+  padding: 35px 16px;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.submit{
+  text-align: center;
+  margin-top: 2em;
+}
+
+.profile {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 50px;
+  width: auto;
+  justify-content: center;
+}
+
+.profile-details {
+  width: 50%;
+  padding: 30px;
+}
+
+.profile-details label{
+  font-weight: bold;;
+}
+
+.profile-title{
+  padding: 30px 10px 20px;
+  font-size:x-large;
+  font-weight: bold;;
+}

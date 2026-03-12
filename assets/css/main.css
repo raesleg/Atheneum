@@ -1,0 +1,80 @@
+:root {
+    --navy:        #1a2c5b;
+    --navy-mid:    #243580;
+    --gold:        #c9a84c;
+    --gold-light:  #e8c97a;
+    --ink:         #1c1a14;
+    --muted:       #8a8070;
+    --line:        #eeeae0;
+    --bg:          #f7f5f0;
+}
+
+.custom-navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--line);
+}
+
+.brand-logo {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #000 !important;
+}
+
+.navbar-nav .nav-link {
+    color: #222 !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 6px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--navy-mid) !important;
+}
+
+.active-link::after {
+    content: "•";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--gold);
+    font-size: 0.5rem;
+    height: auto;
+    background: none;
+    width: auto;
+}
+
+.active-link {
+    color: var(--navy) !important;
+    background-color: #e8e4f0;
+    padding: 6px 14px !important;
+    border-radius: 20px;
+}
+
+.icon-link {
+    color: #222;
+    font-size: 1.2rem;
+    text-decoration: none;
+    position: relative;
+}
+
+.icon-link:hover {
+    color: var(--navy-mid);
+}
+
+.badge-circle {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: var(--gold);
+    color: #fff;
+    font-size: 0.65rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -2,9 +2,10 @@ CREATE DATABASE IF NOT EXISTS db_atheneum;
 USE db_atheneum;
 
 CREATE TABLE Users (
-    userId INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    username VARCHAR(45) NOT NULL UNIQUE PRIMARY KEY,
+    email VARCHAR(45) NOT NULL UNIQUE,
+    fname VARCHAR(45) NULL,
+    lname VARCHAR(45) NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('customer', 'admin') NOT NULL DEFAULT 'customer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -24,22 +25,22 @@ CREATE TABLE Products (
 
 CREATE TABLE Cart (
     cartId INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    userId INT UNSIGNED NOT NULL,
+    username VARCHAR(45) NOT NULL,
     productId INT UNSIGNED NOT NULL,
     quantity INT UNSIGNED NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_cart_user
-        FOREIGN KEY (userId) REFERENCES Users(userId)
+        FOREIGN KEY (username) REFERENCES Users(username)
         ON DELETE CASCADE,
     CONSTRAINT fk_cart_product
         FOREIGN KEY (productId) REFERENCES Products(productId)
         ON DELETE CASCADE,
-    CONSTRAINT uq_cart_user_product UNIQUE (userId, productId)
+    CONSTRAINT uq_cart_user_product UNIQUE (username, productId)
 );
 
 CREATE TABLE Orders (
     orderId INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    userId INT UNSIGNED NOT NULL,
+    username VARCHAR(45) NOT NULL,
     totalPrice DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     orderStatus ENUM('pending', 'paid', 'shipped', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
@@ -49,7 +50,7 @@ CREATE TABLE Orders (
     receiptUrl VARCHAR(255),
     paid_at TIMESTAMP NULL,
     CONSTRAINT fk_order_user
-        FOREIGN KEY (userId) REFERENCES Users(userId)
+        FOREIGN KEY (username) REFERENCES Users(username)
         ON DELETE CASCADE
 );
 

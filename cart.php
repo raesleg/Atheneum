@@ -1,38 +1,29 @@
 <?php 
+$pageTitle = "Shopping Cart";
+$extraCSS = [
+    "assets/css/cart.css"
+];
+$extraJS = [
+    ["src" => "assets/js/cart.js", "defer" => true]
+];
+
 include 'inc/header.php';
+include 'inc/nav.php'; 
 
-// Handle AJAX requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data      = json_decode(file_get_contents('php://input'), true);
-    $action    = $data['action'];
-    $productId = (int) $data['productId'];
-    $sessionId = session_id();
-
-    if ($action === 'update') {
-        $qty  = (int) $data['qty'];
-        $stmt = $conn->prepare("UPDATE Cart SET quantity = ? WHERE sessionId = ? AND productId = ?");
-        $stmt->bind_param("isi", $qty, $sessionId, $productId);
-        $stmt->execute();
-
-    } elseif ($action === 'remove') {
-        $stmt = $conn->prepare("DELETE FROM Cart WHERE sessionId = ? AND productId = ?");
-        $stmt->bind_param("si", $sessionId, $productId);
-        $stmt->execute();
-    }
-
-    echo json_encode(['success' => true]);
-    exit; // ← important, stops the rest of the page from rendering
+// Redirect to login if not logged in
+if (!$isLoggedIn) {
+    header('Location: login.php');
+    exit;
 }
 
-include 'inc/nav.php'; 
-// not considering sessionid yet
 $stmt = $conn->prepare("
     SELECT c.cartId, c.quantity, c.productId,
            p.title, p.author, p.price, p.cover_image
     FROM Cart c
     JOIN Products p ON c.productId = p.productId
+    WHERE c.username = ?
 ");
-// $stmt->bind_param("i", $userId); //replace with session
+$stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -47,26 +38,22 @@ while ($row = $result->fetch_assoc()) {
         'cover' => $row['cover_image'],
     ];
 }
-
 $subtotal = array_sum(array_map(fn($i) => $i['price'] * $i['qty'], $cart_items));
 $shipping = $subtotal > 50 ? 0 : 4.99;
 $total    = $subtotal + $shipping;
 ?>
 
-<!-- ── PAGE HEADER ── -->
 <div class="page-header">
     <p class="eyebrow">Your Selection</p>
     <h1>Shopping Cart</h1>
 </div>
 
-<!-- ── MAIN CONTENT ── -->
 <div class="cart-wrapper">
-
     <?php if (empty($cart_items)): ?>
     <div class="empty-cart">
         <i class="bi bi-bag"></i>
         <p>Your cart is empty.</p>
-        <a href="index.php" class="checkout-btn" style="display:inline-block;width:auto;padding:14px 40px;text-decoration:none;">
+        <a href="index.php" class="checkout-btn">
             Continue Browsing
         </a>
     </div>
@@ -152,68 +139,9 @@ $total    = $subtotal + $shipping;
     <?php endif; ?>
 </div>
 
-<?php include 'inc/footer.php'; ?>
-
 <script>
-    // Item prices from PHP
-    const prices = {
-        <?php foreach ($cart_items as $item): ?>
-        <?= $item['id'] ?>: <?= $item['price'] ?>,
-        <?php endforeach; ?>
-    }
-    const qtys = {
-        <?php foreach ($cart_items as $item): ?>
-        <?= $item['id'] ?>: <?= $item['qty'] ?>,
-        <?php endforeach; ?>
-    }
-
-    function changeQty(id, delta) {
-        qtys[id] = Math.max(1, (qtys[id] || 1) + delta);
-        document.getElementById('qty-' + id).textContent = qtys[id];
-        document.getElementById('total-' + id).textContent = '$' + (prices[id] * qtys[id]).toFixed(2);
-        recalc();
-
-        fetch('cart.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'update', productId: id, qty: qtys[id] })
-        });
-    }
-
-    function removeItem(id) {
-        const el = document.getElementById('item-' + id);
-        el.classList.add('removing');
-
-        fetch('cart.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'remove', productId: id })
-        }).then(() => {
-            setTimeout(() => {
-                el.remove();
-                delete prices[id];
-                delete qtys[id];
-                recalc();
-                updateCount();
-            }, 300);
-        });
-    }
-    function recalc() {
-        let subtotal = 0;
-        for (const id in prices) subtotal += prices[id] * qtys[id];
-        const shipping = subtotal === 0 ? 0 : (subtotal > 50 ? 0 : 4.99);
-        const total = subtotal + shipping;
-
-        document.getElementById('summary-subtotal').textContent = '$' + subtotal.toFixed(2);
-        document.getElementById('summary-shipping').innerHTML =
-            shipping === 0 ? '<span class="free-shipping-note">Free</span>' : '$' + shipping.toFixed(2);
-        document.getElementById('summary-total').textContent = '$' + total.toFixed(2);
-    }
-
-    function updateCount() {
-        const remaining = Object.keys(prices).length;
-        document.getElementById('cart-count').textContent = remaining;
-    }
+    const prices = <?= json_encode(array_column($cart_items, 'price', 'id')) ?>;
+    const qtys = <?= json_encode(array_column($cart_items, 'qty', 'id')) ?>;
 </script>
-</body>
-</html>
+
+<?php include 'inc/footer.php'; ?>
