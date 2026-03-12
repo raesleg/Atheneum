@@ -14,7 +14,9 @@ if ($isLoggedIn) {
     <div class="container-fluid px-4 px-lg-5">
 
         <!-- Logo -->
-        <a class="navbar-brand brand-logo" href="index.php">ATHENEUM</a>
+        <a class="navbar-brand" href="index.php">
+            <img src="assets/Atheneum_logo.svg" alt="ATHENEUM" height="40">
+        </a>
 
         <!-- Mobile Toggle -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
