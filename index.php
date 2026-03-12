@@ -1,9 +1,13 @@
-<?php
-require_once 'inc/db.php';
+<?php include 'inc/header.php'; ?>
+<?php include 'inc/nav.php'; ?>
 
-$conn = getDBConnection();
+<section class="hero-section">
+    <div class="container-fluid px-0">
+        <div class="hero-image">
+            <!-- Replace with your actual hero image -->
+            <!-- <img src="" class="img-fluid w-100"> -->
+        </div>
+    </div>
+</section>
 
-echo "<h1>Database connected successfully</h1>";
-
-$conn->close();
-?>
+<?php include 'inc/footer.php'; ?>
