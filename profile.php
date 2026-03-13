@@ -5,7 +5,7 @@ $extraCSS = [
 ];
 
 include 'inc/header.php';
-include 'inc/nav.php';
+
 
 if (!$isLoggedIn) {
     header("Location: login.php");
@@ -28,21 +28,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("ssss", $fname, $lname, $email, $username);
     $stmt->execute();
     $stmt->close();
-
     header("Location: profile.php?updated=1");
     exit();
 }
-
+include 'inc/nav.php';
 $stmt = $conn->prepare("SELECT username, fname, lname, email FROM users WHERE username=?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
-$row = $stmt->get_result()->fetch_assoc();
+$result = $stmt->get_result();
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $uname = $row["username"] ?? '';
+    $fname = $row["fname"] ?? '';
+    $lname = $row["lname"] ?? '';
+    $email = $row["email"] ?? '';
+
+}
 $stmt->close();
 
-$username = $row['username'];
-$fname = $row['fname'];
-$lname = $row['lname'];
-$email = $row['email'];
 ?>
 
 <main>
@@ -51,7 +54,7 @@ $email = $row['email'];
     <?php endif; ?>
 
     <div class="profile-title">Your profile</div>
-    <form action="profile.php" method="post">
+    <form method="post">
         <div class="profile">
             <div class="profile-details">
                 <div class="mb-3">

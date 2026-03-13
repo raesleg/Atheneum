@@ -1,10 +1,10 @@
 <?php
 $pageTitle = "Profile";
 $extraCSS = [
-    "assets/css/login.css"
+    "../assets/css/login.css"
 ];
-include 'inc/header.php'; // session_start + $conn both ready
-include "inc/nav.php";
+include '../inc/header.php'; // session_start + $conn both ready
+
 
 $errorMsg = "";
 if (isset($_SESSION['error'])) {
@@ -70,22 +70,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if ($success) {
         session_write_close();
-        header("Location: index.php");
+        header("Location: ../index.php");
             exit();
     }
     else{
         $_SESSION['error'] = $errorMsg;
-            header("Location: register.php");
+            header("Location: ../register.php");
             exit();
     }
+    
 }
-
+include "../inc/nav.php";
 function sanitize_input($data) {
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
 function saveMemberToDB() {
-    global $conn, $username, $fname, $lname, $email, $pwd_hashed, $errorMsg, $success;
+    global $conn, $username, $fname, $lname, $email, $pwd_hashed, $role, $errorMsg, $success;
 
     if (!$conn) {
         $errorMsg .= "Database connection failed.<br>";
@@ -113,10 +114,11 @@ function saveMemberToDB() {
     }
     $checkStmt->close();
 
-    // Insert new user
+    // Insert new admin
+    $role = 'admin';
     $stmt = $conn->prepare("
-        INSERT INTO users (username, fname, lname, email, password)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO users (username, fname, lname, email, password, role)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
 
     if (!$stmt) {
@@ -125,7 +127,7 @@ function saveMemberToDB() {
         return;
     }
 
-    $stmt->bind_param("sssss", $username, $fname, $lname, $email, $pwd_hashed);
+    $stmt->bind_param("ssssss", $username, $fname, $lname, $email, $pwd_hashed, $role);
 
     if (!$stmt->execute()) {
         $errorMsg .= "Execute failed: " . $stmt->error . "<br>";
@@ -177,10 +179,10 @@ function saveMemberToDB() {
                 <button class="btn btn-primary" type="submit">Submit</button>
                 </div>
             </form>
-            <div>Already have an account? <a href="login.php">Sign in here! </a>
+            <div>Already have an account? <a href="../login.php">Sign in here! </a>
             </div>
         </div>
     </div>
 </main>
 
-<?php include 'inc/footer.php'; ?>
+<?php include '../inc/footer.php'; ?>

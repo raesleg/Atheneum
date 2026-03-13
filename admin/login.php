@@ -1,7 +1,7 @@
 <?php
 $pageTitle = "Login";
 $extraCSS = [
-    "assets/css/login.css"
+    "../assets/css/login.css"
 ];
 $extraJS = [
     ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
@@ -103,7 +103,7 @@ function authenticateUser($conn) { // receives $conn
                 <h1>Sign in</h1>
             </div>
             <div class="error"><?php echo htmlspecialchars($errorMsg); ?></div>
-            <form method="post">
+            <form action="login.php" method="post">
                 <div class="mb-3">
                 <label class="form-label" for="username">Username:</label>
                 <input required maxlength="45" class="form-control" type="text" id="username" name="username"

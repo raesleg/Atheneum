@@ -1,6 +1,6 @@
 <?php
 session_start(); //cache session for user login state
-require_once 'inc/db.php'; //db connection (local)
+require_once(__DIR__ . "/db.php"); //db connection (local)
 $conn = getDBConnection();
 echo "<script>console.log(" . json_encode("db connected") . ");</script>";
 
@@ -10,6 +10,11 @@ $extraJS = $extraJS ?? [];
 
 $username = $_SESSION['username'] ?? null; //caching session username
 $isLoggedIn = isset($username);
+
+// Detect base URL automatically
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
+$host = $_SERVER['HTTP_HOST'];
+$baseUrl = $protocol . $host;
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +33,7 @@ $isLoggedIn = isset($username);
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="<?= $baseUrl ?>/assets/css/main.css">
     <?php foreach ($extraCSS as $css): ?>
         <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
     <?php endforeach; ?>

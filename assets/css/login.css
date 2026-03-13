@@ -50,3 +50,7 @@
   font-size:x-large;
   font-weight: bold;;
 }
+
+.error{
+  color: red;
+}
