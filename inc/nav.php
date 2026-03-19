@@ -14,8 +14,8 @@ if ($isLoggedIn) {
     <div class="container-fluid px-4 px-lg-5">
 
         <!-- Logo -->
-        <a class="navbar-brand" href="index.php">
-            <img src="assets/Atheneum_logo.svg" alt="ATHENEUM" height="40">
+        <a class="navbar-brand" href="<?= $baseUrl ?>/index.php">
+            <img src="<?= $baseUrl ?>/assets/Atheneum_logo.svg" alt="ATHENEUM" height="40">
         </a>
 
         <!-- Mobile Toggle -->
@@ -29,7 +29,7 @@ if ($isLoggedIn) {
             <!-- Center Menu -->
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-4">
                 <li class="nav-item">
-                    <a class="nav-link" href="index.php">HOME</a>
+                    <a class="nav-link" href="<?= $baseUrl ?>/index.php">HOME</a>
                 </li>
 
                 <li class="nav-item">
@@ -61,7 +61,7 @@ if ($isLoggedIn) {
                         <i class="bi bi-heart"></i>
                         <span class="badge-circle">0</span>
                     </a>
-                    <a href="cart.php" class="icon-link position-relative">
+                    <a href="<?= $baseUrl ?>/cart.php" class="icon-link position-relative">
                         <i class="bi bi-bag"></i>
                         <span class="badge-circle" id="cart-count"><?= $cartCount ?></span>
                     </a>
@@ -72,15 +72,15 @@ if ($isLoggedIn) {
                             <span style="font-size:0.85rem;font-weight:500"><?= htmlspecialchars($username) ?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i>My Profile</a></li>
-                            <li><a class="dropdown-item" href="orders.php"><i class="bi bi-bag-check me-2"></i>My Orders</a></li>
+                            <li><a class="dropdown-item" href="<?= $baseUrl ?>/profile.php"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                            <li><a class="dropdown-item" href="<?= $baseUrl ?>/orders.php"><i class="bi bi-bag-check me-2"></i>My Orders</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="process_logout.php"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item text-danger" href="<?= $baseUrl ?>/process_logout.php"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                         </ul>
                     </div>
                 <?php else: ?>
-                    <a href="login.php" class="btn btn-outline-dark btn-sm" style="font-size:0.78rem;letter-spacing:1px;border-radius:4px">Login</a>
-                    <a href="register.php" class="btn btn-dark btn-sm" style="font-size:0.78rem;letter-spacing:1px;border-radius:4px">Sign Up</a>
+                    <a href="<?= $baseUrl ?>/login.php" class="btn btn-outline-dark btn-sm" style="font-size:0.78rem;letter-spacing:1px;border-radius:4px">Login</a>
+                    <a href="<?= $baseUrl ?>/register.php" class="btn btn-dark btn-sm" style="font-size:0.78rem;letter-spacing:1px;border-radius:4px">Sign Up</a>
                 <?php endif; ?>                
             </div>
         </div>

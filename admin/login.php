@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!$result->success) {
         $_SESSION['error'] = "Please complete the reCAPTCHA.";
-        header("Location: index.php");
+        header("Location: dashboard.php");
         exit();
     } else {
         $username = "";
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($success) {
             session_write_close();
-            header("Location: index.php");
+            header("Location: dashboard.php");
             exit();
         } else {
             $_SESSION['error'] = $errorMsg;

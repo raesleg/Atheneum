@@ -1,0 +1,254 @@
+:root {
+    --navy: #1a2c5b;
+    --navy-mid: #243580;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --ink: #1c1a14;
+    --muted: #8a8070;
+    --line: #eeeae0;
+    --bg: #f7f5f0;
+    --danger: #c0392b;
+    --success: #27ae60;
+}
+
+body { background: var(--bg); }
+
+.admin-wrapper {
+    max-width: 1200px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--line);
+}
+
+.admin-header h1 {
+    font-size: 1.8rem;
+    color: var(--navy);
+    margin: 0;
+}
+
+.admin-header .badge-admin {
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* Refund Section */
+.section-title {
+    font-size: 1.1rem;
+    color: var(--navy);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title .count-badge {
+    background: var(--danger);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.refund-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(26,44,91,0.07);
+    margin-bottom: 2.5rem;
+    font-size: 0.88rem;
+}
+
+.refund-table th {
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.refund-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+}
+
+.refund-table tr:last-child td { border-bottom: none; }
+.refund-table tr:hover td { background: #faf9f6; }
+
+.status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-pill.cancelled { background: #fdecea; color: var(--danger); }
+.status-pill.refunded  { background: #eafaf1; color: var(--success); }
+.status-pill.pending   { background: #fef9e7; color: #d68910; }
+
+.empty-state {
+    background: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    box-shadow: 0 2px 12px rgba(26,44,91,0.07);
+    margin-bottom: 2.5rem;
+}
+
+/* Products Section */
+.products-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.btn-add-book {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.btn-add-book:hover { background: var(--navy-mid); color: #fff; }
+.btn-add-book .plus { font-size: 1.1rem; line-height: 1; }
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(26,44,91,0.07);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(26,44,91,0.12);
+}
+
+.product-card .cover {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 2.5rem;
+}
+
+.product-card .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-card .card-body {
+    padding: 1rem;
+}
+
+.product-card .book-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-card .book-author {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.product-card .book-price {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.product-card .book-stock {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-left: 8px;
+}
+
+.product-card .card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.btn-sm-edit {
+    flex: 1;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    background: #faf9f6;
+    transition: all 0.15s;
+}
+
+.btn-sm-edit:hover { background: var(--line); color: var(--navy); }
+
+.flash-msg {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.flash-success { background: #eafaf1; color: var(--success); border: 1px solid #a9dfbf; }
+.flash-error   { background: #fdecea; color: var(--danger); border: 1px solid #f5b7b1; }
