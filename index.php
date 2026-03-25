@@ -1,4 +1,5 @@
 <?php 
+include 'inc/conn.php'; 
 include 'inc/header.php';
 include 'inc/nav.php'; 
 ?>

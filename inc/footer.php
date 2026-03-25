@@ -11,6 +11,5 @@
         </script>
     <?php endforeach; ?>
 <?php endif; ?>
-<?php $conn->close(); ?>
 </body>
 </html>

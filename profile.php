@@ -3,9 +3,8 @@ $pageTitle = "Profile";
 $extraCSS = [
     "assets/css/login.css"
 ];
-
+include 'inc/conn.php'; 
 include 'inc/header.php';
-
 
 if (!$isLoggedIn) {
     header("Location: login.php");
@@ -45,7 +44,6 @@ if ($result->num_rows > 0) {
 
 }
 $stmt->close();
-
 ?>
 
 <main>

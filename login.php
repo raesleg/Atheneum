@@ -7,17 +7,53 @@ $extraJS = [
     ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
     ["src" => "assets/js/main.js", "defer" => true]
 ];
+include 'inc/conn.php'; 
+include 'inc/header.php';
 
-include 'inc/header.php'; // session_start + $conn both ready
-include 'inc/nav.php'; 
 
-$errorMsg = "";
+//CSRF
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$alertMsg = "";
+$errorMsg = [];
 if (isset($_SESSION['error'])) {
-    $errorMsg = $_SESSION['error'];
+    $errorMsg = (array)$_SESSION['error'];
     unset($_SESSION['error']);
+}
+if (isset($_SESSION['alert'])) {
+    $alertMsg = $_SESSION['alert'];
+    unset($_SESSION['alert']);
+}
+
+// --- Rate Limiting ---
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['first_attempt_time'] = time();
+}
+
+$maxAttempts = 5;        // Max login attempts
+$timeWindow = 60;       // 5 minutes in seconds
+
+// Reset counter after time window
+if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['first_attempt_time'] = time();
+}
+
+// Check if user is temporarily blocked
+if ($_SESSION['login_attempts'] >= $maxAttempts) {
+    die("Too many login attempts. Please try again after"+$timeWindow/60+ "minutes.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $errorMsg[] = "Invalid request. Please reload the page and try again.";
+        $success = false;
+    }
+    // Optionally regenerate the token after a successful check
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
     $recaptcha_secret = "6LeIwoYsAAAAAJWYbC-3bkRgoXnRFW32Gr-GsMfL";
     $recaptcha_response = $_POST['g-recaptcha-response'];
     $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$recaptcha_secret}&response={$recaptcha_response}");
@@ -25,21 +61,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!$result->success) {
         $_SESSION['error'] = "Please complete the reCAPTCHA.";
-        header("Location: index.php");
+        header("Location: login.php");
         exit();
     } else {
         $username = "";
         $success = true;
 
         if (empty($_POST["username"])) {
-            $errorMsg .= "Username is required.<br>";
+            $errorMsg[] = "Username is required.";
             $success = false;
         } else {
             $username = sanitize_input($_POST["username"]);
         }
 
         if (empty($_POST["pwd"])) {
-            $errorMsg .= "Password is required.<br>";
+            $errorMsg[] = "Password is required.";
             $success = false;
         }
 
@@ -83,27 +119,45 @@ function authenticateUser($conn) { // receives $conn
         $pwd_hashed = $row["password"];
 
         if (!password_verify($_POST["pwd"], $pwd_hashed)) {
-            $errorMsg = "Email not found or password doesn't match.";
+            $errorMsg[] = "Incorrect username or password.";
             $success = false;
+            $_SESSION['login_attempts'] += 1;
         } else {
-            $_SESSION['username'] = $username;
             session_regenerate_id(true);
+            $_SESSION['username'] = $username;
+            $_SESSION['role'] = $row['role'];
+            
         }
     } else {
-        $errorMsg = "Username not found or password doesn't match.";
+        $errorMsg[] = "Incorrect username or password.";
         $success = false;
+        $_SESSION['login_attempts'] += 1;
     }
     $stmt->close();
 }
+
+
 ?>
+<?php if ($alertMsg): ?>
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <?php echo htmlspecialchars($alertMsg); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
+    <?php include 'inc/nav.php'; ?>
+    
 <main>
+    
     <div class="container">
         <div class="card">
             <div class="card-header">
                 <h1>Sign in</h1>
             </div>
-            <div class="error"><?php echo htmlspecialchars($errorMsg); ?></div>
+            <div class="error"><?php foreach ($errorMsg as $error): ?>
+                    <?php echo htmlspecialchars($error); ?>
+                <?php endforeach; ?></div>
             <form method="post">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="mb-3">
                 <label class="form-label" for="username">Username:</label>
                 <input required maxlength="45" class="form-control" type="text" id="username" name="username"

@@ -2,13 +2,16 @@ CREATE DATABASE IF NOT EXISTS db_atheneum;
 USE db_atheneum;
 
 CREATE TABLE Users (
-    username VARCHAR(45) NOT NULL UNIQUE PRIMARY KEY,
+    userId INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(45) NOT NULL UNIQUE,
     email VARCHAR(45) NOT NULL UNIQUE,
     fname VARCHAR(45) NULL,
     lname VARCHAR(45) NOT NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('customer', 'admin') NOT NULL DEFAULT 'customer',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reset_token VARCHAR(255) NULL,
+    reset_expiry DATETIME NULL
 );
 
 CREATE TABLE Products (

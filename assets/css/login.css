@@ -53,4 +53,10 @@
 
 .error{
   color: red;
+  text-align: center;
+}
+
+.alert{
+  z-index: 1;
+  text-align: center;
 }

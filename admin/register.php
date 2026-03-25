@@ -5,7 +5,7 @@ $extraCSS = [
 ];
 include '../inc/header.php'; // session_start + $conn both ready
 
-
+$conn = getDBConnection();
 $errorMsg = "";
 if (isset($_SESSION['error'])) {
     $errorMsg = $_SESSION['error'];
@@ -70,8 +70,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if ($success) {
         session_write_close();
-        header("Location: ../index.php");
+        if ($role === 'admin') {
+            header("Location: admin_dashboard.php");
             exit();
+        } else {
+            header("Location: index.php");
+            exit();
+        }
     }
     else{
         $_SESSION['error'] = $errorMsg;
