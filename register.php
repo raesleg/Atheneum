@@ -84,7 +84,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if ($success) {
         session_regenerate_id(true);
-        header("Location: index.php");
+        $_SESSION['alert'] = "Account created successfully. Please login";
+        header("Location: login.php");
             exit();
     }
 }
@@ -115,7 +116,7 @@ function saveMemberToDB() {
     $checkStmt->store_result();
 
     if ($checkStmt->num_rows > 0) {
-        $errorMsg[] = "Username or email already exists.";
+        $errorMsg[] = "Username already exists.";
         $success = false;
         $checkStmt->close();
         return;

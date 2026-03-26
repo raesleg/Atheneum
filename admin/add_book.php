@@ -2,6 +2,7 @@
 $pageTitle = "Add Book";
 $extraCSS = ["css/add_book.css"];
 $extraJS = ["src" => "../assets/js/add_book.js", "defer" => true];
+include '../inc/conn.php'; 
 include '../inc/header.php';
 
 if (!$isLoggedIn) {

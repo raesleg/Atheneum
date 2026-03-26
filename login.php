@@ -17,6 +17,7 @@ if (empty($_SESSION['csrf_token'])) {
 }
 $alertMsg = "";
 $errorMsg = [];
+$success = true;
 if (isset($_SESSION['error'])) {
     $errorMsg = (array)$_SESSION['error'];
     unset($_SESSION['error']);
@@ -47,6 +48,7 @@ if ($_SESSION['login_attempts'] >= $maxAttempts) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $errorMsg[] = "Invalid request. Please reload the page and try again.";
         $success = false;
@@ -85,9 +87,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($success) {
             session_write_close();
-            header("Location: index.php");
-            exit();
-        } else {
+            if ($_SESSION['role'] === 'admin') {
+                header("Location: admin/dashboard.php");
+                exit();
+            } else {
+                header("Location: index.php");
+                exit();
+            }
+        }
+        else {
             $_SESSION['error'] = $errorMsg;
             header("Location: login.php");
             exit();
@@ -126,7 +134,8 @@ function authenticateUser($conn) { // receives $conn
             session_regenerate_id(true);
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $row['role'];
-            
+            $_SESSION['loggedin'] = true;
+            $success = true;
         }
     } else {
         $errorMsg[] = "Incorrect username or password.";

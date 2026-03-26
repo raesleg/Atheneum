@@ -1,5 +1,6 @@
 <?php
 $pageTitle = "Edit Book";
+include '../inc/conn.php'; 
 include '../inc/header.php';
 include '../inc/nav.php';
 

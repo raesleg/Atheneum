@@ -1,17 +1,26 @@
 <?php
 $pageTitle = "Admin Dashboard";
 $extraCSS = ["css/dashboard.css"];
+include '../inc/conn.php'; 
 include '../inc/header.php';
 
+$isLoggedIn = false;
+if (isset($_SESSION['loggedin'])) {
+    $isLoggedIn = $_SESSION['loggedin'];
+    
+}
 // Admin only
-if (!$isLoggedIn) {
-    header("Location: ../login.php"); exit();
+if ($isLoggedIn != true) {
+    $_SESSION['alert'] = "Please login.";
+    header("Location: ../login.php");
+    exit();
 }
 $stmt = $conn->prepare("SELECT role FROM Users WHERE username = ?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $row = $stmt->get_result()->fetch_assoc();
 if (!$row || $row['role'] !== 'admin') {
+    $_SESSION['alert'] = "Invalid access.";
     header("Location: ../index.php"); 
     exit();
 }
