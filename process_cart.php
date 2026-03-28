@@ -11,7 +11,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action    = $data['action'];
     $productId = (int) $data['productId'];
 
-    if ($action === 'update') {
+    if ($action === 'add') {
+        $qty = isset($data['qty']) ? (int) $data['qty'] : 1;
+        $stmt = $conn->prepare("
+            INSERT INTO Cart (username, productId, quantity)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+        ");
+        $stmt->bind_param("sii", $username, $productId, $qty);
+        $stmt->execute();
+        
+    } elseif ($action === 'update') {
         $qty  = (int) $data['qty'];
         $stmt = $conn->prepare("UPDATE Cart SET quantity = ? WHERE username = ? AND productId = ?");
         $stmt->bind_param("isi", $qty, $username, $productId);
