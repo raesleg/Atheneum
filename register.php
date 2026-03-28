@@ -104,7 +104,7 @@ function saveMemberToDB() {
     }
 
     // Check duplicate username or email
-    $checkStmt = $conn->prepare("SELECT username FROM users WHERE username = ? OR email = ?");
+    $checkStmt = $conn->prepare("SELECT username FROM Users WHERE username = ? OR email = ?");
     if (!$checkStmt) {
         $errorMsg[] = "Prepare failed: " . $conn->error;
         $success = false;
@@ -125,7 +125,7 @@ function saveMemberToDB() {
 
     // Insert new user
     $stmt = $conn->prepare("
-        INSERT INTO users (username, fname, lname, email, password)
+        INSERT INTO Users (username, fname, lname, email, password)
         VALUES (?, ?, ?, ?, ?)
     ");
 

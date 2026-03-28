@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lname = sanitize_input($_POST['lname']);
     $email = sanitize_input($_POST['email']);
 
-    $stmt = $conn->prepare("UPDATE users SET fname=?, lname=?, email=? WHERE username=?");
+    $stmt = $conn->prepare("UPDATE Users SET fname=?, lname=?, email=? WHERE username=?");
     $stmt->bind_param("ssss", $fname, $lname, $email, $username);
     $stmt->execute();
     $stmt->close();
@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 include 'inc/nav.php';
-$stmt = $conn->prepare("SELECT username, fname, lname, email FROM users WHERE username=?");
+$stmt = $conn->prepare("SELECT username, fname, lname, email FROM Users WHERE username=?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $result = $stmt->get_result();
