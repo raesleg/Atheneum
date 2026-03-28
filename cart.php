@@ -6,7 +6,7 @@ $extraCSS = [
 $extraJS = [
     ["src" => "assets/js/cart.js", "defer" => true]
 ];
-
+include 'inc/conn.php'; 
 include 'inc/header.php';
 include 'inc/nav.php'; 
 
@@ -21,9 +21,9 @@ $stmt = $conn->prepare("
            p.title, p.author, p.price, p.cover_image
     FROM Cart c
     JOIN Products p ON c.productId = p.productId
-    WHERE c.username = ?
+    WHERE c.userId = ?
 ");
-$stmt->bind_param("s", $username);
+$stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 

@@ -4,12 +4,17 @@ $extraCSS = $extraCSS ?? [];
 $extraJS = $extraJS ?? [];
 
 $username = $_SESSION['username'] ?? null; //caching session username
+$userId = $_SESSION['userId'] ?? null; //caching session userId for cart
 $isLoggedIn = isset($username);
 
 // Detect base URL automatically
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
 $host = $_SERVER['HTTP_HOST'];
-$baseUrl = $protocol . $host;
+
+$isLocal = in_array($host, ['localhost', '127.0.0.1']);
+$basePath = $isLocal ? '/Atheneum' : '';
+
+$baseUrl = $protocol . $host . $basePath;
 ?>
 
 <!DOCTYPE html>

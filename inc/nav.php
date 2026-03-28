@@ -2,8 +2,8 @@
 // $conn and $username already set by header.php
 $cartCount = 0;
 if ($isLoggedIn) {
-    $stmt = $conn->prepare("SELECT SUM(quantity) as total FROM Cart WHERE username = ?");
-    $stmt->bind_param("s", $username);
+    $stmt = $conn->prepare("SELECT SUM(quantity) as total FROM Cart WHERE userId = ?");
+    $stmt->bind_param("s", $userId);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
     $cartCount = $row['total'] ?? 0;

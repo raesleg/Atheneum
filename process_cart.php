@@ -1,4 +1,5 @@
 <?php
+include 'inc/conn.php';
 include 'inc/header.php';
 
 if (!$isLoggedIn) {
@@ -13,13 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'update') {
         $qty  = (int) $data['qty'];
-        $stmt = $conn->prepare("UPDATE Cart SET quantity = ? WHERE username = ? AND productId = ?");
-        $stmt->bind_param("isi", $qty, $username, $productId);
+        $stmt = $conn->prepare("UPDATE Cart SET quantity = ? WHERE userId = ? AND productId = ?");
+        $stmt->bind_param("iii", $qty, $userId, $productId);
         $stmt->execute();
 
     } elseif ($action === 'remove') {
-        $stmt = $conn->prepare("DELETE FROM Cart WHERE username = ? AND productId = ?");
-        $stmt->bind_param("si", $username, $productId);
+        $stmt = $conn->prepare("DELETE FROM Cart WHERE userId = ? AND productId = ?");
+        $stmt->bind_param("ii", $userId, $productId);
         $stmt->execute();
     }
 
