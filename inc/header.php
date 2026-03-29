@@ -3,13 +3,20 @@ $pageTitle = $pageTitle ?? "Atheneum"; //dynamic page title, css, js
 $extraCSS = $extraCSS ?? [];
 $extraJS = $extraJS ?? [];
 
-$username = $_SESSION['username'] ?? null; //caching session username
+$username   = $_SESSION['username'] ?? null; //caching session username
+$userId     = $_SESSION['userId']   ?? null; //caching session userId for cart
 $isLoggedIn = isset($username);
 
-// Detect base URL automatically
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
-$host = $_SERVER['HTTP_HOST'];
-$baseUrl = $protocol . $host;
+// Detect base URL automatically (works on localhost:8080 and Google Cloud)
+$protocol        = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+$host            = $_SERVER['HTTP_HOST']; // includes port e.g. localhost:8080
+$hostWithoutPort = explode(':', $host)[0];
+$isLocal         = in_array($hostWithoutPort, ['localhost', '127.0.0.1']);
+$basePath        = $isLocal ? '/Atheneum' : '';
+$baseUrl         = $protocol . $host . $basePath;
+//for localhost testing
+// $basePath = '';
+// $baseUrl  = $protocol . $host . $basePath;
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +42,7 @@ $baseUrl = $protocol . $host;
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= $baseUrl ?>/assets/css/main.css">
     <?php foreach ($extraCSS as $css): ?>
-        <link rel="stylesheet" href="<?= htmlspecialchars($css) ?>">
+        <link rel="stylesheet" href="<?= $baseUrl ?>/<?= htmlspecialchars(ltrim($css, '/')) ?>">
     <?php endforeach; ?>
 </head>
 <body>

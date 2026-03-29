@@ -1,0 +1,149 @@
+/* assets/css/faq.css */
+
+/* ── Page header ── */
+.faq-page-header {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 3.5rem 0 2.5rem;
+    text-align: center;
+}
+.faq-header-inner { max-width: 620px; margin: 0 auto; }
+.faq-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.5rem;
+}
+.faq-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 400; color: var(--navy);
+    margin-bottom: 0.75rem; line-height: 1.2;
+}
+.faq-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; color: var(--muted); line-height: 1.7;
+}
+.faq-subtitle a { color: var(--navy-mid); font-weight: 500; }
+.faq-subtitle a:hover { text-decoration: underline; }
+
+/* ── Category pills ── */
+.faq-category-nav {
+    display: flex; gap: 0.6rem; flex-wrap: wrap;
+    padding-top: 1.75rem; padding-bottom: 0.5rem;
+}
+.faq-cat-pill {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--navy); background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 50px; padding: 0.4rem 1rem;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+}
+.faq-cat-pill:hover {
+    background: #faf6ec;
+    border-color: var(--gold);
+    color: var(--navy);
+}
+
+/* ── Content ── */
+.faq-content { padding-bottom: 5rem; }
+.faq-empty { text-align: center; padding: 4rem; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+
+/* ── Sections ── */
+.faq-section { padding: 2.5rem 0 0.5rem; }
+.faq-section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 400;
+    color: var(--navy); margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gold);
+    display: inline-block;
+}
+
+/* ── Accordion ── */
+.faq-accordion {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item:last-child { border-bottom: none; }
+
+.faq-question {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    background: #fff;
+    border: none; cursor: pointer;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem; font-weight: 500;
+    color: var(--ink);
+    transition: background 0.2s;
+}
+.faq-question:hover { background: #faf6ec; }
+.faq-question[aria-expanded="true"] {
+    background: #faf6ec;
+    color: var(--navy);
+}
+
+.faq-icon {
+    font-size: 1.1rem;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+.faq-question[aria-expanded="true"] .faq-icon {
+    transform: rotate(0deg);
+}
+
+.faq-answer {
+    padding: 0 1.25rem 1.1rem 1.25rem;
+    background: #faf6ec;
+}
+.faq-answer p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; color: var(--muted);
+    line-height: 1.75; margin: 0;
+}
+
+/* ── Bottom CTA ── */
+.faq-cta {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem 2rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+.faq-cta-icon {
+    width: 52px; height: 52px;
+    background: #faf6ec; border: 1px solid var(--gold-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; color: var(--gold);
+    margin: 0 auto 1rem;
+}
+.faq-cta-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 400;
+    color: var(--navy); margin-bottom: 0.5rem;
+}
+.faq-cta-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; color: var(--muted);
+    margin-bottom: 1.5rem;
+}
+.faq-cta-btn {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.7rem 1.8rem;
+    background: var(--navy); color: var(--bg);
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+    font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 4px; text-decoration: none;
+    transition: background 0.2s;
+}
+.faq-cta-btn:hover { background: var(--navy-mid); color: var(--bg); }

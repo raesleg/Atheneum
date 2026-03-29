@@ -4,8 +4,15 @@
 <!-- Custom JS -->
 <?php if (!empty($extraJS)): ?>
     <?php foreach ($extraJS as $script): ?>
+        <?php
+        $src = $script['src'];
+        // Only prefix relative paths; leave CDN URLs (http/https) untouched
+        if (!str_starts_with($src, 'http://') && !str_starts_with($src, 'https://')) {
+            $src = $baseUrl . '/' . ltrim($src, '/');
+        }
+        ?>
         <script
-            src="<?= htmlspecialchars($script['src']) ?>"
+            src="<?= htmlspecialchars($src) ?>"
             <?= !empty($script['async']) ? 'async' : '' ?>
             <?= !empty($script['defer']) ? 'defer' : '' ?>>
         </script>

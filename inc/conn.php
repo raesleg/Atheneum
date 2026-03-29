@@ -1,7 +1,6 @@
 <?php
-session_start(); //cache session for user login state
-require_once(__DIR__ . "/db.php"); //db connection (local)
+ob_start(); // buffer output so header() works even after HTML is sent
+session_start(); // cache session for user login state
+require_once(__DIR__ . "/db.php"); 
 $conn = getDBConnection();
-// remove echo for production, only for debugging
-echo "<script>console.log(" . json_encode("db connected") . ");</script>";
 ?>

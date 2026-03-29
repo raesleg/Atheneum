@@ -132,6 +132,7 @@ function authenticateUser($conn) { // receives $conn
             $_SESSION['login_attempts'] += 1;
         } else {
             session_regenerate_id(true);
+            $_SESSION['userId'] = $row['userId']; // add this for cart queries
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $row['role'];
             $_SESSION['loggedin'] = true;
