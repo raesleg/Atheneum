@@ -83,7 +83,6 @@
     color: var(--ink);
     margin: 0 0 8px;
     line-height: 1.2;
-    text-decoration: underline;
 }
 
 .book-author-lg {
