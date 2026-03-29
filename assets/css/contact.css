@@ -1,0 +1,118 @@
+/* assets/css/contact.css */
+
+.contact-page-header {
+    background: #fff; border-bottom: 1px solid var(--line);
+    padding: 3.5rem 0 2.5rem; text-align: center;
+}
+.contact-header-inner { max-width: 580px; margin: 0 auto; }
+.contact-header-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; color: var(--muted); line-height: 1.75; margin-top: 0.75rem;
+}
+
+.contact-layout {
+    display: grid; grid-template-columns: 300px 1fr;
+    gap: 3rem; padding-top: 3rem; padding-bottom: 5rem; align-items: start;
+}
+@media (max-width: 860px) { .contact-layout { grid-template-columns: 1fr; } }
+
+/* Info sidebar */
+.contact-info { display: flex; flex-direction: column; gap: 1rem; }
+.contact-info-card {
+    display: flex; align-items: flex-start; gap: 0.9rem;
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; padding: 1.1rem 1.25rem;
+    transition: border-color 0.2s;
+}
+.contact-info-card:hover { border-color: var(--gold); }
+.contact-info-icon {
+    width: 38px; height: 38px; flex-shrink: 0;
+    background: #faf6ec; border: 1px solid var(--gold-light);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: var(--gold);
+}
+.contact-info-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700; margin-bottom: 0.2rem;
+}
+.contact-info-value {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem; font-weight: 600; color: var(--navy); margin-bottom: 0.1rem;
+}
+.contact-info-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; color: var(--muted);
+}
+
+/* Map */
+.contact-map {
+    border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--line); height: 200px;
+}
+.contact-map iframe { width: 100%; height: 100%; border: none; display: block; }
+
+/* Form card */
+.contact-form-col {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 12px; padding: 2rem;
+}
+
+/* Alerts */
+.contact-success, .contact-errors {
+    display: flex; gap: 0.85rem; align-items: flex-start;
+    padding: 1rem 1.1rem; border-radius: 8px; margin-bottom: 1.5rem;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+}
+.contact-success { background: #e8f7f0; border: 1px solid #a8dfc0; color: #1a5c38; }
+.contact-success i { font-size: 1.2rem; margin-top: 0.1rem; flex-shrink: 0; }
+.contact-errors  { background: #fde8e8; border: 1px solid #f5c6c6; color: #8b1a1a; }
+.contact-errors i { font-size: 1.1rem; margin-top: 0.15rem; flex-shrink: 0; }
+.contact-errors ul { margin: 0; padding-left: 1rem; }
+.contact-success strong { display: block; margin-bottom: 0.25rem; }
+.contact-success p { margin: 0; }
+
+/* Form fields */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 540px) { .form-row { grid-template-columns: 1fr; } }
+.form-group { margin-bottom: 1.1rem; }
+.form-label-custom {
+    display: block; font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem;
+}
+.req { color: #c0524f; }
+.form-input-custom {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--ink);
+    transition: border-color 0.2s, background 0.2s;
+    resize: vertical;
+}
+.form-input-custom::placeholder { color: var(--muted); opacity: 0.7; }
+.form-input-custom:focus {
+    outline: none; border-color: var(--gold); background: #fff;
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+}
+.form-footer {
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;
+}
+.form-note {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; color: var(--muted); margin: 0;
+}
+
+/* Reuse btn-hero-primary from index.css */
+.btn-hero-primary {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--navy); color: #fff;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 0.7rem 1.8rem; border: none; border-radius: 4px;
+    cursor: pointer; text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.btn-hero-primary:hover { background: var(--navy-mid); color: #fff; }
