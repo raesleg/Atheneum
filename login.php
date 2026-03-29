@@ -113,7 +113,7 @@ function sanitize_input($data) {
 function authenticateUser($conn) { // receives $conn
     global $username, $fname, $lname, $email, $pwd_hashed, $errorMsg, $success;
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT * FROM Users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -132,6 +132,7 @@ function authenticateUser($conn) { // receives $conn
             $_SESSION['login_attempts'] += 1;
         } else {
             session_regenerate_id(true);
+            $_SESSION['userId'] = $row['userId']; // add this for cart queries
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $row['role'];
             $_SESSION['loggedin'] = true;

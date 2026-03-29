@@ -1,7 +1,11 @@
 <?php
 function getDBConnection() {
-    $config = parse_ini_file(__DIR__ . '/../config/db-config.ini');
+    // Try local config first (XAMPP), then fall back to server path (Google Cloud)
+    $localPath  = __DIR__ . '/../config/db-config.ini';
+    $serverPath = '/var/www/private/db-config.ini';
+    $configPath = file_exists($localPath) ? $localPath : $serverPath;
 
+    $config = parse_ini_file($configPath);
     if (!$config) {
         die("Database config file not found.");
     }

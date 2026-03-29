@@ -108,7 +108,7 @@ function saveMemberToDB() {
     }
 
     // Check duplicate username or email
-    $checkStmt = $conn->prepare("SELECT username FROM users WHERE username = ? OR email = ?");
+    $checkStmt = $conn->prepare("SELECT username FROM Users WHERE username = ? OR email = ?");
     if (!$checkStmt) {
         $errorMsg[] = "Prepare failed: " . $conn->error;
         $success = false;
@@ -130,7 +130,7 @@ function saveMemberToDB() {
     // Insert new admin
     $role = 'admin';
     $stmt = $conn->prepare("
-        INSERT INTO users (username, fname, lname, email, password, role)
+        INSERT INTO Users (username, fname, lname, email, password, role)
         VALUES (?, ?, ?, ?, ?, ?)
     ");
 

@@ -27,7 +27,7 @@ if (!$token) {
 //     unset($_SESSION['error']);
 // }
 
-$stmt = $conn->prepare("SELECT username, reset_expiry FROM users WHERE reset_token=?");
+$stmt = $conn->prepare("SELECT username, reset_expiry FROM Users WHERE reset_token=?");
 $stmt->bind_param("s", $token);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
@@ -85,7 +85,7 @@ function updatePassword() {
         return;
     }
 
-    $checkStmt = $conn->prepare("SELECT username FROM users WHERE username = ?");
+    $checkStmt = $conn->prepare("SELECT username FROM Users WHERE username = ?");
     if (!$checkStmt) {
         $errorMsg[] = "Prepare failed: " . $conn->error;
         $success = false;
@@ -106,7 +106,7 @@ function updatePassword() {
     $checkStmt->close();
 
     // Update password
-    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE username = ?");
+    $stmt = $conn->prepare("UPDATE Users SET password = ? WHERE username = ?");
     if (!$stmt) {
         $errorMsg[] = "Prepare failed: " . $conn->error;
         $success = false;
