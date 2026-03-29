@@ -7,9 +7,13 @@ $pageTitle = "Reset Password";
 $extraCSS = [
     "assets/css/login.css"
 ];
+$extraJS = [
+    ["src" => "assets/js/main.js", "defer" => true] 
+];
+
 include 'inc/conn.php'; 
 include 'inc/header.php';
-include "inc/nav.php";
+// include "inc/nav.php";
 
 //CSRF
 if (empty($_SESSION['csrf_token'])) {
@@ -52,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $link = "http://localhost:8000/new_password.php?token=" . $token;
 
         if (sendEmail($email, $link)) {
-            $_SESSION['alert'] = "Reset link sent!";
+            $_SESSION['alert'] = "If this email exists, a reset link has been sent.";
             $success=true;
             
         } else {
@@ -60,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     else{
-        $errorMsg[] = "Email not found.";
+        $_SESSION['alert'] = "If this email exists, a reset link has been sent.";
 
     }
     header("Location: reset_password.php");
@@ -71,18 +75,24 @@ function sendEmail($to, $link) {
     $mail = new PHPMailer(true);
     try{
         $mail->isSMTP();
+        // $mail->Host = 'smtp.gmail.com';
         $mail->Host = 'sandbox.smtp.mailtrap.io';
         $mail->SMTPAuth = true;
         $mail->Username = '2327ad7a4371df';
         $mail->Password = '834865c96d87bf';
-        $mail->Port = 2525;
+        // Real emails
+        // $mail->Username = 'cgxh125@gmail.com';
+        // $mail->Password = 'fntm fpnz qekr zovh';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
         $mail->Timeout = 10;
+        $mail->isHTML(false);
 
-        $mail->setFrom('no-reply@yourapp.com', 'Atheneum');
+        $mail->setFrom('no-reply@atheneum.com', 'Atheneum');
         $mail->addAddress($to);
 
         $mail->Subject = 'Password Reset';
-        $mail->Body = "Click here to reset your password: $link";
+        $mail->Body = "Click here to reset your password: \n$link";
         return $mail->send();
     } 
     catch (Exception $e) {
@@ -92,14 +102,14 @@ function sendEmail($to, $link) {
 }
 ?>
 
-<html lang="en">
-    <body>
-        <?php if ($alertMsg): ?>
+<?php if ($alertMsg): ?>
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
         <?php echo htmlspecialchars($alertMsg); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
+    <?php include 'inc/nav.php'; ?>
+
         <main>
             <div class="container">
                 <div class="card">
@@ -124,6 +134,4 @@ function sendEmail($to, $link) {
                 </div>
             </div>
         </main>
-
-    </body>
-</html>
+<?php include 'inc/footer.php'; ?>

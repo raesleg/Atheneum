@@ -11,7 +11,8 @@ CREATE TABLE Users (
     role ENUM('customer', 'admin') NOT NULL DEFAULT 'customer',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     reset_token VARCHAR(255) NULL,
-    reset_expiry DATETIME NULL
+    reset_expiry DATETIME NULL,
+    profile_pic VARCHAR(255) NULL DEFAULT "assets/images/default-avatar.jpg"
 );
 
 CREATE TABLE Products (

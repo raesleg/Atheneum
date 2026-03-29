@@ -69,8 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         updatePassword();
     }
 
-    $hashed = password_hash($_POST["password_new"], PASSWORD_DEFAULT);
-
     $_SESSION['alert'] = "Password updated. You can log in now.";
     header("Location: login.php");
     exit();
@@ -106,7 +104,7 @@ function updatePassword() {
     $checkStmt->close();
 
     // Update password
-    $stmt = $conn->prepare("UPDATE Users SET password = ? WHERE username = ?");
+    $stmt = $conn->prepare("UPDATE Users SET password = ?, reset_token = NULL, reset_expiry = NULL WHERE username = ?");
     if (!$stmt) {
         $errorMsg[] = "Prepare failed: " . $conn->error;
         $success = false;
@@ -123,8 +121,6 @@ function updatePassword() {
     $stmt->close();
 }
 ?>
-<html lang="en">
-    <body>
         <main>
             <div class="container">
                 <div class="card">
@@ -154,5 +150,4 @@ function updatePassword() {
                 </div>
             </div>
         </main>
-    </body>
-</html>
+<?php include 'inc/footer.php'; ?>

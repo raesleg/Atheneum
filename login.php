@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Optionally regenerate the token after a successful check
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-    $recaptcha_secret = "6LeIwoYsAAAAAJWYbC-3bkRgoXnRFW32Gr-GsMfL";
+    $recaptcha_secret = "6LdCK5wsAAAAAC12fTpTk88DcWeDc5niNbSWNbLd";
     $recaptcha_response = $_POST['g-recaptcha-response'];
     $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$recaptcha_secret}&response={$recaptcha_response}");
     $result = json_decode($verify);
@@ -174,14 +174,14 @@ function authenticateUser($conn) { // receives $conn
                 </div>
                 <div class="mb-3">
                 <label class="form-label" for="pwd">Password:</label>
-                <input required class="form-control" type="password" id="pwd" name="pwd"
+                <input required minlength="8" maxlength="64" class="form-control" type="password" id="pwd" name="pwd"
                 placeholder="Enter password">
                 <a href="reset_password.php">Forgot your password?</a>
                 </div>
                 <div>
                     
                 </div>
-                <div class="g-recaptcha" data-sitekey="6LeIwoYsAAAAACMekBEfuTa75miLq2yIoLKgb8F-"></div>
+                <div class="g-recaptcha" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div>
                 <div class="mb-3 submit">
                 <button class="btn btn-primary" type="submit">Submit</button>
                 </div>

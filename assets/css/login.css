@@ -60,3 +60,9 @@
   z-index: 1;
   text-align: center;
 }
+
+.g-recaptcha {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
