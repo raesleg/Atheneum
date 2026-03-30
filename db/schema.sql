@@ -46,18 +46,18 @@ CREATE TABLE IF NOT EXISTS Cart (
 
 CREATE TABLE IF NOT EXISTS Orders (
     orderId         INT UNSIGNED  AUTO_INCREMENT PRIMARY KEY,
-    username        VARCHAR(45)   NOT NULL,
+    userId          INT UNSIGNED   NOT NULL,
     totalPrice      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     created_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
     orderStatus     ENUM('pending','paid','shipped','completed','cancelled') NOT NULL DEFAULT 'pending',
-    paymentStatus   ENUM('unpaid','pending','paid','failed','refunded')      NOT NULL DEFAULT 'unpaid',
-    stripeSessionId VARCHAR(100)  NULL,
+    paymentStatus   ENUM('unpaid','pending','paid','failed','refunded')      NOT NULL DEFAULT 'pending',
+    stripeSessionId VARCHAR(255)  NULL,
     paymentId       VARCHAR(100)  NULL,
     receiptUrl      VARCHAR(255)  NULL,
     paid_at         TIMESTAMP     NULL,
     CONSTRAINT fk_order_user
-        FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE,
-    INDEX idx_order_username (username)
+        FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE CASCADE,
+    INDEX idx_order_user (userId)
 );
 
 CREATE TABLE IF NOT EXISTS OrderItems (
@@ -75,15 +75,15 @@ CREATE TABLE IF NOT EXISTS OrderItems (
 CREATE TABLE IF NOT EXISTS Reviews (
     reviewId   INT UNSIGNED     AUTO_INCREMENT PRIMARY KEY,
     productId  INT UNSIGNED     NOT NULL,
-    username   VARCHAR(45)      NOT NULL,
+    userId     INT UNSIGNED     NOT NULL,
     orderId    INT UNSIGNED     NOT NULL,
     rating     TINYINT UNSIGNED NOT NULL CHECK (rating BETWEEN 1 AND 5),
     comment    VARCHAR(200)     NULL,
     created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_review_product FOREIGN KEY (productId) REFERENCES Products(productId) ON DELETE CASCADE,
-    CONSTRAINT fk_review_user    FOREIGN KEY (username)  REFERENCES Users(username)     ON DELETE CASCADE,
+    CONSTRAINT fk_review_user    FOREIGN KEY (userId)  REFERENCES Users(userId)     ON DELETE CASCADE,
     CONSTRAINT fk_review_order   FOREIGN KEY (orderId)   REFERENCES Orders(orderId)     ON DELETE CASCADE,
-    CONSTRAINT uq_review_user_product UNIQUE (username, productId),
+    CONSTRAINT uq_review_user_product UNIQUE (userId, productId),
     INDEX idx_review_product (productId)
 );
 
