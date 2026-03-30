@@ -128,7 +128,7 @@ $total    = $subtotal + $shipping;
                 <span id="summary-total">$<?= number_format($total, 2) ?></span>
             </div>
 
-            <button class="checkout-btn">Proceed to Checkout</button>
+            <button class="checkout-btn" id="checkout-btn">Proceed to Checkout</button>
             <a href="products.php" class="continue-link">← Continue shopping</a>
         </aside>
 

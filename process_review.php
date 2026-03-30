@@ -56,7 +56,7 @@ $stmtElig = $conn->prepare("
     FROM Orders o
     JOIN OrderItems oi ON o.orderId = oi.orderId
     JOIN OrderShipments s ON o.orderId = s.orderId
-    WHERE o.username = ?
+    WHERE o.userId = ?
       AND oi.productId = ?
       AND o.orderId = ?
       AND o.paymentStatus = 'paid'
@@ -64,7 +64,7 @@ $stmtElig = $conn->prepare("
       AND s.delivered_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
     LIMIT 1
 ");
-$stmtElig->bind_param("siii", $username, $productId, $orderId, $REVIEW_WINDOW_DAYS);
+$stmtElig->bind_param("iiii", $userId, $productId, $orderId, $REVIEW_WINDOW_DAYS);
 $stmtElig->execute();
 $eligible = $stmtElig->get_result()->fetch_assoc();
 $stmtElig->close();

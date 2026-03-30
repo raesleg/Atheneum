@@ -57,7 +57,7 @@ $starCounts   = [
 $stmtReviews = $conn->prepare("
     SELECT r.rating, r.comment, r.created_at, u.username, u.fname, u.lname
     FROM Reviews r
-    JOIN Users u ON r.username = u.username
+    JOIN Users u ON r.userId = u.userId
     WHERE r.productId = ?
     ORDER BY r.created_at DESC
 ");
@@ -71,8 +71,8 @@ $alreadyReviewed = false;
 $reviewEligibleOrderId = null;
 
 if ($isLoggedIn) {
-    $stmtCheck = $conn->prepare("SELECT reviewId FROM Reviews WHERE username = ? AND productId = ?");
-    $stmtCheck->bind_param("si", $username, $productId);
+    $stmtCheck = $conn->prepare("SELECT reviewId FROM Reviews WHERE userId = ? AND productId = ?");
+    $stmtCheck->bind_param("ii", $userId, $productId);
     $stmtCheck->execute();
     if ($stmtCheck->get_result()->num_rows > 0) {
         $alreadyReviewed = true;
@@ -85,14 +85,14 @@ if ($isLoggedIn) {
             FROM Orders o
             JOIN OrderItems oi ON o.orderId = oi.orderId
             JOIN OrderShipments s ON o.orderId = s.orderId
-            WHERE o.username = ?
+            WHERE o.userId = ?
               AND oi.productId = ?
               AND o.paymentStatus = 'paid'
               AND s.currentStatus = 'delivered'
               AND s.delivered_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
             LIMIT 1
         ");
-        $stmtEligible->bind_param("sii", $username, $productId, $REVIEW_WINDOW_DAYS);
+        $stmtEligible->bind_param("iii", $userId, $productId, $REVIEW_WINDOW_DAYS);
         $stmtEligible->execute();
         $eligibleRow = $stmtEligible->get_result()->fetch_assoc();
         if ($eligibleRow) {
