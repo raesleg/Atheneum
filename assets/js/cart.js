@@ -1,12 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-
     const params = new URLSearchParams(window.location.search);
     if (params.get('paid') === '1') {
         window.history.replaceState(null, '', window.location.pathname);
         showPaymentToast();
     }
 
-        function changeQty(id, delta) {
+    function changeQty(id, delta) {
         qtys[id] = Math.max(1, (qtys[id] || 1) + delta);
         document.getElementById('qty-' + id).textContent = qtys[id];
         document.getElementById('total-' + id).textContent = '$' + (prices[id] * qtys[id]).toFixed(2);
@@ -37,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 300);
         });
     }
+
+    window.changeQty = changeQty;
+    window.removeItem = removeItem;
 
     function recalc() {
         let subtotal = 0;
@@ -88,17 +90,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.body.appendChild(toast);
 
-        // Trigger entrance
         requestAnimationFrame(function () {
             requestAnimationFrame(function () {
                 toast.classList.add('show');
             });
         });
 
-        // Auto-dismiss after 5s
         const timer = setTimeout(function () { dismiss(toast); }, 5000);
 
-        // Manual close
         toast.querySelector('.pt-close').addEventListener('click', function () {
             clearTimeout(timer);
             dismiss(toast);

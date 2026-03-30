@@ -9,7 +9,7 @@ if (file_exists($configPath)) {
     $stripeWebhookSecret = $config['stripe_webhook_secret'] ?? null;
 } else {
     $stripeSecretKey = getenv('STRIPE_SECRET_KEY');
-    // $stripeWebhookSecret = getenv('STRIPE_WEBHOOK_SECRET');
+    $stripeWebhookSecret = getenv('STRIPE_WEBHOOK_SECRET');
 }
 
 if (!$stripeSecretKey) {
