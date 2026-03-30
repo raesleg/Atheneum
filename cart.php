@@ -43,101 +43,98 @@ $shipping = $subtotal > 50 ? 0 : 4.99;
 $total    = $subtotal + $shipping;
 ?>
 
-<div class="page-header">
-    <p class="eyebrow">Your Selection</p>
-    <h1>Shopping Cart</h1>
-</div>
-
-<div class="cart-wrapper">
-    <?php if (empty($cart_items)): ?>
-    <div class="empty-cart">
-        <i class="bi bi-bag"></i>
-        <p>Your cart is empty.</p>
-        <a href="index.php" class="checkout-btn">
-            Continue Browsing
-        </a>
+<main id="main-content">
+    <div class="page-header">
+        <p class="eyebrow">Your Selection</p>
+        <h1>Shopping Cart</h1>
     </div>
 
-    <?php else: ?>
+    <div class="cart-wrapper">
+        <?php if (empty($cart_items)): ?>
+        <div class="empty-cart">
+            <i class="bi bi-bag"></i>
+            <p>Your cart is empty.</p>
+            <a href="index.php" class="checkout-btn">
+                Continue Browsing
+            </a>
+        </div>
 
-    <!-- Items Column -->
-    <div class="cart-items-col">
-        <p class="section-label"><?= count($cart_items) ?> item<?= count($cart_items) !== 1 ? 's' : '' ?></p>
+        <?php else: ?>
 
-        <?php foreach ($cart_items as $item): ?>
-        <div class="cart-item" id="item-<?= $item['id'] ?>">
-            <!-- Cover -->
-            <?php if (!empty($item['cover'])): ?>
-                <img src="<?= htmlspecialchars($item['cover']) ?>" alt="<?= htmlspecialchars($item['title']) ?>" class="book-cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                <div class="book-cover-placeholder" style="display:none"><i class="bi bi-book"></i></div>
-            <?php else: ?>
-                <div class="book-cover-placeholder"><i class="bi bi-book"></i></div>
-            <?php endif; ?>
+        <!-- Items Column -->
+        <div class="cart-items-col">
+            <p class="section-label"><?= count($cart_items) ?> item<?= count($cart_items) !== 1 ? 's' : '' ?></p>
 
-            <!-- Meta -->
-            <div class="item-meta">
-                <p class="item-title"><?= htmlspecialchars($item['title']) ?></p>
-                <p class="item-author"><?= htmlspecialchars($item['author']) ?></p>
-                <p class="item-price-unit">$<?= number_format($item['price'], 2) ?> each</p>
-                <div class="qty-controls">
-                    <button class="qty-btn" onclick="changeQty(<?= $item['id'] ?>, -1)">−</button>
-                    <span class="qty-display" id="qty-<?= $item['id'] ?>"><?= $item['qty'] ?></span>
-                    <button class="qty-btn" onclick="changeQty(<?= $item['id'] ?>, 1)">+</button>
+            <?php foreach ($cart_items as $item): ?>
+            <div class="cart-item" id="item-<?= $item['id'] ?>">
+                <!-- Cover -->
+                <?php if (!empty($item['cover'])): ?>
+                    <img src="<?= htmlspecialchars($item['cover']) ?>" alt="<?= htmlspecialchars($item['title']) ?>" class="book-cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="book-cover-placeholder" style="display:none"><i class="bi bi-book"></i></div>
+                <?php else: ?>
+                    <div class="book-cover-placeholder"><i class="bi bi-book"></i></div>
+                <?php endif; ?>
+
+                <!-- Meta -->
+                <div class="item-meta">
+                    <p class="item-title"><?= htmlspecialchars($item['title']) ?></p>
+                    <p class="item-author"><?= htmlspecialchars($item['author']) ?></p>
+                    <p class="item-price-unit">$<?= number_format($item['price'], 2) ?> each</p>
+                    <div class="qty-controls">
+                        <button class="qty-btn" aria-label="Decrease quantity of <?= htmlspecialchars($item['title']) ?>"onclick="changeQty(<?= $item['id'] ?>, -1)">−</button>
+                        <span class="qty-display" id="qty-<?= $item['id'] ?>"><?= $item['qty'] ?></span>
+                        <button class="qty-btn" aria-label="Increase quantity of <?= htmlspecialchars($item['title']) ?>" onclick="changeQty(<?= $item['id'] ?>, 1)">+</button>
+                    </div>
+                </div>
+
+                <!-- Price + Remove -->
+                <div class="item-right">
+                    <span class="item-total" id="total-<?= $item['id'] ?>">$<?= number_format($item['price'] * $item['qty'], 2) ?></span>
+                    <button class="remove-btn" aria-label="Remove <?= htmlspecialchars($item['title']) ?> from cart" onclick="removeItem(<?= $item['id'] ?>, <?= $item['price'] ?>)">
+                        <i class="bi bi-x"></i> Remove
+                    </button>
                 </div>
             </div>
+            <?php endforeach; ?>
+        </div>
 
-            <!-- Price + Remove -->
-            <div class="item-right">
-                <span class="item-total" id="total-<?= $item['id'] ?>">$<?= number_format($item['price'] * $item['qty'], 2) ?></span>
-                <button class="remove-btn" onclick="removeItem(<?= $item['id'] ?>, <?= $item['price'] ?>)">
-                    <i class="bi bi-x"></i> Remove
-                </button>
+        <!-- Summary Panel -->
+        <aside class="summary-panel">
+            <p class="summary-title">Order Summary</p>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="summary-subtotal">$<?= number_format($subtotal, 2) ?></span>
             </div>
-        </div>
-        <?php endforeach; ?>
-    </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span id="summary-shipping">
+                    <?php if ($shipping == 0): ?>
+                        <span class="free-shipping-note">Free</span>
+                    <?php else: ?>
+                        $<?= number_format($shipping, 2) ?>
+                    <?php endif; ?>
+                </span>
+            </div>
+            <?php if ($subtotal < 50): ?>
+            <div class="summary-row">
+                <span class="free-shipping-note">
+                    Add $<?= number_format(50 - $subtotal, 2) ?> more for free shipping
+                </span>
+            </div>
+            <?php endif; ?>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span id="summary-total">$<?= number_format($total, 2) ?></span>
+            </div>
 
-    <!-- Summary Panel -->
-    <aside class="summary-panel">
-        <p class="summary-title">Order Summary</p>
+            <button class="checkout-btn">Proceed to Checkout</button>
+            <a href="products.php" class="continue-link">← Continue shopping</a>
+        </aside>
 
-        <div class="summary-row">
-            <span>Subtotal</span>
-            <span id="summary-subtotal">$<?= number_format($subtotal, 2) ?></span>
-        </div>
-        <div class="summary-row">
-            <span>Shipping</span>
-            <span id="summary-shipping">
-                <?php if ($shipping == 0): ?>
-                    <span class="free-shipping-note">Free</span>
-                <?php else: ?>
-                    $<?= number_format($shipping, 2) ?>
-                <?php endif; ?>
-            </span>
-        </div>
-        <?php if ($subtotal < 50): ?>
-        <div class="summary-row">
-            <span style="font-size:0.72rem;color:#7aab7a">
-                Add $<?= number_format(50 - $subtotal, 2) ?> more for free shipping
-            </span>
-        </div>
         <?php endif; ?>
-        <div class="summary-row total">
-            <span>Total</span>
-            <span id="summary-total">$<?= number_format($total, 2) ?></span>
-        </div>
-
-        <div class="promo-row">
-            <input type="text" class="promo-input" placeholder="Promo code">
-            <button class="promo-btn">Apply</button>
-        </div>
-
-        <button class="checkout-btn">Proceed to Checkout</button>
-        <a href="index.php" class="continue-link">← Continue shopping</a>
-    </aside>
-
-    <?php endif; ?>
-</div>
+    </div>
+</main>
 
 <script>
     const prices = <?= json_encode(array_column($cart_items, 'price', 'id')) ?>;

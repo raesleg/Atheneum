@@ -1,7 +1,10 @@
 <?php
 $pageTitle = "Book Details";
 $extraCSS  = ["assets/css/book.css"];
-$extraJS   = [["src" => "assets/js/review.js", "defer" => true]];
+$extraJS   = [
+    ["src" => "assets/js/review.js", "defer" => true],
+    ["src" => "assets/js/book.js","defer" => true],
+];
 
 include 'inc/conn.php';
 include 'inc/header.php';
@@ -152,8 +155,10 @@ if ($isLoggedIn) {
                 </p>
 
                 <?php if ($isLoggedIn && $book['quantity'] > 0): ?>
-                    <button class="add-to-cart-btn" id="addToCartBtn" 
+                    <button class="add-to-cart-btn" id="addToCartBtn"
                             data-product-id="<?= $productId ?>"
+                            data-book-title="<?= htmlspecialchars($book['title'], ENT_QUOTES) ?>"
+                            data-book-cover="<?= htmlspecialchars($book['cover_image'] ?? '', ENT_QUOTES) ?>"
                             aria-label="Add <?= htmlspecialchars($book['title']) ?> to cart">
                         <i class="bi bi-bag-plus" aria-hidden="true"></i> Add to Cart
                     </button>
@@ -288,36 +293,5 @@ if ($isLoggedIn) {
         </div>
     </section>
 </main>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var btn = document.getElementById('addToCartBtn');
-    if (btn) {
-        btn.addEventListener('click', function() {
-            var pid = this.dataset.productId;
-            fetch('process_cart.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'add', productId: parseInt(pid), qty: 1 })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    var badge = document.getElementById('cart-count');
-                    if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
-                    btn.innerHTML = '<i class="bi bi-check-lg" aria-hidden="true"></i> Added!';
-                    btn.setAttribute('aria-label', 'Added to cart');
-                    btn.classList.add('added');
-                    setTimeout(function() {
-                        btn.innerHTML = '<i class="bi bi-bag-plus" aria-hidden="true"></i> Add to Cart';
-                        btn.setAttribute('aria-label', 'Add to cart');
-                        btn.classList.remove('added');
-                    }, 2000);
-                }
-            });
-        });
-    }
-});
-</script>
 
 <?php include 'inc/footer.php'; ?>

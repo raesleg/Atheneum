@@ -41,8 +41,3 @@ function recalc() {
         shipping === 0 ? '<span class="free-shipping-note">Free</span>' : '$' + shipping.toFixed(2);
     document.getElementById('summary-total').textContent = '$' + total.toFixed(2);
 }
-
-function updateCount() {
-    const remaining = Object.keys(prices).length;
-    document.getElementById('cart-count').textContent = remaining;
-}

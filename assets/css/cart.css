@@ -219,40 +219,9 @@
 }
 .free-shipping-note {
     font-size: 0.72rem;
-    color: #7aab7a;
+    color: #4f6f4f !important;
     letter-spacing: 0.5px;
 }
-
-.promo-row {
-    display: flex;
-    gap: 8px;
-    margin: 20px 0;
-}
-.promo-input {
-    flex: 1;
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.82rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-.promo-input:focus { border-color: var(--navy-mid); }
-.promo-input::placeholder { color: #bbb; }
-.promo-btn {
-    background: #e8e4f0;
-    border: 1px solid #c8c0e0;
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.78rem;
-    letter-spacing: 1px;
-    color: var(--navy-mid);
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.promo-btn:hover { background: #d8d0e8; }
 
 .checkout-btn {
     display: block;
