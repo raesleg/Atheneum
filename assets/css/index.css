@@ -1,35 +1,10 @@
-/* assets/css/index.css — Homepage styles
+/* assets/css/index.css - Homepage styles
    Fonts: Playfair Display (display) + DM Sans (body)
    Colours: from main.css :root variables
 */
 
-/* ── Shared typography helpers ── */
-.section-eyebrow {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 0.5rem;
-}
-.section-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 400;
-    color: var(--navy);
-    line-height: 1.2;
-    margin: 0;
-}
-.section-rule {
-    width: 40px;
-    height: 2px;
-    background: var(--gold);
-    border: none;
-    margin: 1rem 0 1.5rem;
-}
 
-/* ── Hero ── */
+/* Hero section */
 .hero-section {
     background: linear-gradient(155deg, #faf8f4 0%, #fff 55%);
     border-bottom: 1px solid var(--line);
@@ -113,7 +88,7 @@
 }
 .hero-stat-divider { width: 1px; height: 32px; background: var(--line); }
 
-/* ── Carousel ── */
+/* Carousel */
 .hero-carousel-wrap { position: relative; }
 .hero-carousel { position: relative; min-height: clamp(380px, 45vh, 520px); }
 .hero-slide {
@@ -179,7 +154,7 @@
 }
 .carousel-dot.active { background: var(--gold); width: 18px; border-radius: 3px; }
 
-/* ── Genre strip ── */
+/* Genre strip */
 .genre-strip {
     display: flex; gap: 1rem; padding: 2.5rem 0;
     flex-wrap: wrap;
@@ -224,7 +199,7 @@
 }
 .btn-view-all:hover { background: var(--navy); color: #fff; }
 
-/* ── Book card (shared) ── */
+/* Book card (shared) */
 .books-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -294,7 +269,7 @@
 }
 .btn-view-book:hover { background: var(--navy-mid); color: #fff; }
 
-/* ── Why section ── */
+/* Why section */
 .why-section {
     background: #fff;
     border-top: 1px solid var(--line);
@@ -320,7 +295,7 @@
 }
 .why-desc { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
 
-/* ── CTA Banner ── */
+/* CTA Banner */
 .cta-banner { background: var(--navy); padding: 4rem 0; }
 .cta-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
 .cta-heading {

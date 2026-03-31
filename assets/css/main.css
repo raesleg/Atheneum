@@ -9,6 +9,32 @@
     --bg:          #f7f5f0;
 }
 
+/* Shared typography helpers (available on every page) */
+.section-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+}
+.section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1.2;
+    margin: 0;
+}
+.section-rule {
+    width: 40px;
+    height: 2px;
+    background: var(--gold);
+    border: none;
+    margin: 1rem 0 1.5rem;
+}
+
 .custom-navbar {
     background-color: #ffffff;
     border-bottom: 1px solid var(--line);
