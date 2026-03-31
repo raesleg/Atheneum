@@ -1,17 +1,15 @@
 :root {
-    --navy: #1a2c5b;
-    --navy-mid: #243580;
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --ink: #1c1a14;
-    --muted: #8a8070;
-    --line: #eeeae0;
-    --bg: #f7f5f0;
+    --gold: #8a6518;
+    --muted: #6b6257;
     --danger: #c0392b;
-    --success: #27ae60;
+    --success: #1e7e4a;
 }
 
-body { background: var(--bg); }
+body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+}
 
 .admin-wrapper {
     max-width: 1200px;
@@ -29,23 +27,22 @@ body { background: var(--bg); }
 }
 
 .admin-header h1 {
-    font-size: 1.8rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
     color: var(--navy);
-    margin: 0;
 }
 
 .admin-header .badge-admin {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
     background: var(--gold);
     color: #fff;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
     padding: 4px 12px;
     border-radius: 20px;
+    text-transform: uppercase;
 }
 
-/* Refund Section */
 .section-title {
     font-size: 1.1rem;
     color: var(--navy);
@@ -74,7 +71,7 @@ body { background: var(--bg); }
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(26,44,91,0.07);
+    box-shadow: 0 2px 12px rgba(26, 44, 91, 0.07);
     margin-bottom: 2.5rem;
     font-size: 0.88rem;
 }
@@ -96,8 +93,13 @@ body { background: var(--bg); }
     color: var(--ink);
 }
 
-.refund-table tr:last-child td { border-bottom: none; }
-.refund-table tr:hover td { background: #faf9f6; }
+.refund-table tr:last-child td {
+    border-bottom: none;
+}
+
+.refund-table tr:hover td {
+    background: #faf9f6;
+}
 
 .status-pill {
     display: inline-block;
@@ -108,9 +110,20 @@ body { background: var(--bg); }
     text-transform: capitalize;
 }
 
-.status-pill.cancelled { background: #fdecea; color: var(--danger); }
-.status-pill.refunded  { background: #eafaf1; color: var(--success); }
-.status-pill.pending   { background: #fef9e7; color: #d68910; }
+.status-pill.cancelled {
+    background: #fdecea;
+    color: var(--danger);
+}
+
+.status-pill.refunded {
+    background: #eafaf1;
+    color: var(--success);
+}
+
+.status-pill.pending {
+    background: #fef9e7;
+    color: #d68910;
+}
 
 .empty-state {
     background: #fff;
@@ -119,11 +132,10 @@ body { background: var(--bg); }
     text-align: center;
     color: var(--muted);
     font-size: 0.9rem;
-    box-shadow: 0 2px 12px rgba(26,44,91,0.07);
+    box-shadow: 0 2px 12px rgba(26, 44, 91, 0.07);
     margin-bottom: 2.5rem;
 }
 
-/* Products Section */
 .products-header {
     display: flex;
     align-items: center;
@@ -148,8 +160,15 @@ body { background: var(--bg); }
     cursor: pointer;
 }
 
-.btn-add-book:hover { background: var(--navy-mid); color: #fff; }
-.btn-add-book .plus { font-size: 1.1rem; line-height: 1; }
+.btn-add-book:hover {
+    background: var(--navy-mid);
+    color: #fff;
+}
+
+.btn-add-book .plus {
+    font-size: 1.1rem;
+    line-height: 1;
+}
 
 .products-grid {
     display: grid;
@@ -162,13 +181,13 @@ body { background: var(--bg); }
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(26,44,91,0.07);
+    box-shadow: 0 2px 12px rgba(26, 44, 91, 0.07);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .product-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(26,44,91,0.12);
+    box-shadow: 0 6px 20px rgba(26, 44, 91, 0.12);
 }
 
 .product-card .cover {
@@ -241,7 +260,10 @@ body { background: var(--bg); }
     transition: all 0.15s;
 }
 
-.btn-sm-edit:hover { background: var(--line); color: var(--navy); }
+.btn-sm-edit:hover {
+    background: var(--line);
+    color: var(--navy);
+}
 
 .flash-msg {
     padding: 12px 20px;
@@ -250,5 +272,346 @@ body { background: var(--bg); }
     font-size: 0.9rem;
 }
 
-.flash-success { background: #eafaf1; color: var(--success); border: 1px solid #a9dfbf; }
-.flash-error   { background: #fdecea; color: var(--danger); border: 1px solid #f5b7b1; }
+.flash-success {
+    background: #eafaf1;
+    color: var(--success);
+    border: 1px solid #a9dfbf;
+}
+
+.flash-error {
+    background: #fdecea;
+    color: var(--danger);
+    border: 1px solid #f5b7b1;
+}
+
+.refund-list-box {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(26, 44, 91, 0.07);
+    overflow-y: auto;
+    max-height: 260px;
+    margin-bottom: 2.5rem;
+}
+
+.refund-list-box li {
+    padding: 0;
+    margin: 0;
+    display: block;
+}
+
+.refund-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    gap: 1rem;
+}
+
+.refund-row:last-child {
+    border-bottom: none;
+}
+
+.refund-row:hover,
+.refund-row:focus-visible {
+    background: #faf9f6;
+    outline: 2px solid var(--navy-mid);
+    outline-offset: -2px;
+}
+
+.rr-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.rr-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.rr-user {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.rr-meta {
+    font-size: 0.78rem;
+    color: var(--muted);
+}
+
+.rr-amount {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.rr-arrow {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.refund-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 44, 91, 0.35);
+    z-index: 1040;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.refund-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.refund-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(440px, 100vw);
+    background: #fff;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 32px rgba(26, 44, 91, 0.14);
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.refund-panel.open {
+    transform: translateX(0);
+}
+
+body.panel-open {
+    overflow: hidden;
+}
+
+.rp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1.5px solid var(--line);
+    flex-shrink: 0;
+}
+
+.rp-header h2 {
+    font-size: 1.1rem;
+    color: var(--navy);
+    margin: 0;
+}
+
+.rp-close {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-close:hover {
+    background: var(--line);
+    color: var(--navy);
+}
+
+.rp-close:focus-visible {
+    outline: 2px solid var(--navy-mid);
+    outline-offset: 2px;
+}
+
+.rp-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.rp-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    background: #faf9f6;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.rp-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rp-meta-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+}
+
+.rp-meta-value {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.rp-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rp-section-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--navy);
+}
+
+.rp-note-hint {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+    margin-left: 4px;
+}
+
+.rp-reason-text {
+    font-size: 0.9rem;
+    color: var(--ink);
+    line-height: 1.55;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.rp-note-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 7px;
+    font-size: 0.88rem;
+    color: var(--ink);
+    background: #faf9f6;
+    resize: vertical;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.rp-note-input:focus {
+    outline: none;
+    border-color: var(--navy-mid);
+    background: #fff;
+}
+
+.rp-feedback {
+    font-size: 0.85rem;
+    border-radius: 6px;
+    padding: 0;
+    min-height: 0;
+    transition: all 0.2s;
+}
+
+.rp-feedback:not(:empty) {
+    padding: 10px 14px;
+}
+
+.rp-feedback-success {
+    background: #eafaf1;
+    color: var(--success);
+    border: 1px solid #a9dfbf;
+}
+
+.rp-feedback-error {
+    background: #fdecea;
+    color: var(--danger);
+    border: 1px solid #f5b7b1;
+}
+
+.rp-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-top: 1.5px solid var(--line);
+    flex-shrink: 0;
+}
+
+.rp-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 7px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.rp-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.rp-btn:focus-visible {
+    outline: 2px solid var(--navy-mid);
+    outline-offset: 2px;
+}
+
+.rp-btn-reject {
+    background: #fdecea;
+    color: var(--danger);
+    border: 1.5px solid #f5b7b1;
+}
+
+.rp-btn-reject:hover:not(:disabled) {
+    background: #fad4d0;
+}
+
+.rp-btn-approve {
+    background: var(--navy);
+    color: #fff;
+}
+
+.rp-btn-approve:hover:not(:disabled) {
+    background: var(--navy-mid);
+}
+
+@media (max-width: 500px) {
+    .rp-footer {
+        flex-direction: column-reverse;
+    }
+
+    .rp-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
