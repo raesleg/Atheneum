@@ -18,7 +18,7 @@ if (!$isLoggedIn) {
 
 $stmt = $conn->prepare("
     SELECT c.cartId, c.quantity, c.productId,
-           p.title, p.author, p.price, p.cover_image
+           p.title, p.author, p.price, p.cover_image, p.quantity AS quantity_in_stock
     FROM Cart c
     JOIN Products p ON c.productId = p.productId
     WHERE c.userId = ?
@@ -36,6 +36,7 @@ while ($row = $result->fetch_assoc()) {
         'price' => $row['price'],
         'qty'   => $row['quantity'],
         'cover' => $row['cover_image'],
+        'stock' => $row['quantity_in_stock'],
     ];
 }
 $subtotal = array_sum(array_map(fn($i) => $i['price'] * $i['qty'], $cart_items));
@@ -116,13 +117,6 @@ $total    = $subtotal + $shipping;
                     <?php endif; ?>
                 </span>
             </div>
-            <?php if ($subtotal < 50): ?>
-            <div class="summary-row">
-                <span class="free-shipping-note">
-                    Add $<?= number_format(50 - $subtotal, 2) ?> more for free shipping
-                </span>
-            </div>
-            <?php endif; ?>
             <div class="summary-row total">
                 <span>Total</span>
                 <span id="summary-total">$<?= number_format($total, 2) ?></span>
@@ -139,6 +133,7 @@ $total    = $subtotal + $shipping;
 <script>
     const prices = <?= json_encode(array_column($cart_items, 'price', 'id')) ?>;
     const qtys = <?= json_encode(array_column($cart_items, 'qty', 'id')) ?>;
+    const stocks = <?= json_encode(array_column($cart_items, 'stock', 'id')) ?>;
 </script>
 
 <?php include 'inc/footer.php'; ?>

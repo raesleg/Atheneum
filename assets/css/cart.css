@@ -5,7 +5,7 @@
     animation: fadeDown 0.5s ease both;
 }
 .page-header .eyebrow {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     letter-spacing: 4px;
     color: var(--muted);
     text-transform: uppercase;
@@ -13,8 +13,8 @@
 }
 .page-header h1 {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 3.2rem;
-    font-weight: 300;
+    font-size: 3.6rem;
+    font-weight: 400;
     letter-spacing: 2px;
     margin: 0;
 }
@@ -36,10 +36,11 @@
 
 /* ── CART ITEMS ── */
 .section-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--muted);
+    font-weight: 600;
     padding-bottom: 16px;
     border-bottom: 1px solid var(--line);
     margin-bottom: 0;
@@ -47,7 +48,7 @@
 
 .cart-item {
     display: grid;
-    grid-template-columns: 72px 1fr auto;
+    grid-template-columns: 80px 1fr auto;
     gap: 20px;
     align-items: center;
     padding: 24px 0;
@@ -59,21 +60,21 @@
 .cart-item:nth-child(4) { animation-delay: 0.15s; }
 
 .book-cover {
-    width: 72px;
-    height: 100px;
+    width: 80px;
+    height: 108px;
     object-fit: cover;
     border-radius: 3px;
     box-shadow: 3px 4px 14px rgba(0,0,0,0.12);
     flex-shrink: 0;
 }
 .book-cover-placeholder {
-    width: 72px;
-    height: 100px;
+    width: 80px;
+    height: 108px;
     background: linear-gradient(135deg, #e8e4f0, #d8d0e8);
     border-radius: 3px;
     display: flex; align-items: center; justify-content: center;
     color: var(--navy-mid);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
 }
 
 .item-meta { min-width: 0; }
@@ -87,8 +88,9 @@
     text-overflow: ellipsis;
 }
 .item-author {
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     color: var(--muted);
+    font-weight: 500;
     letter-spacing: 0.5px;
     margin: 0 0 14px;
 }
@@ -110,23 +112,24 @@
 .qty-btn {
     background: none;
     border: none;
-    width: 32px; height: 32px;
+    width: 34px; height: 34px;
     cursor: pointer;
     color: var(--ink);
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     transition: background 0.15s;
     display: flex; align-items: center; justify-content: center;
 }
 .qty-btn:hover { background: #e8e4f0; color: var(--navy-mid); }
 .qty-display {
-    width: 36px;
+    width: 40px;
     text-align: center;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
     border-left: 1px solid var(--line);
     border-right: 1px solid var(--line);
-    height: 32px;
-    line-height: 32px;
+    height: 34px;
+    line-height: 34px;
 }
 
 .item-right {
@@ -146,7 +149,8 @@
     border: none;
     cursor: pointer;
     color: var(--muted);
-    font-size: 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 500;
     padding: 0;
     transition: color 0.2s;
     display: flex; align-items: center; gap: 4px;
@@ -172,8 +176,8 @@
 }
 .empty-cart p {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
-    font-weight: 300;
+    font-size: 1.6rem;
+    font-weight: 400;
     color: var(--muted);
     margin-bottom: 28px;
 }
@@ -199,8 +203,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
-    font-size: 0.85rem;
+    padding: 11px 0;
+    font-size: 0.92rem;
+    font-weight: 500;
     color: var(--muted);
     border-bottom: 1px solid var(--line);
 }
@@ -218,7 +223,8 @@
     font-weight: 400;
 }
 .free-shipping-note {
-    font-size: 0.72rem;
+    font-size: 0.80rem;
+    font-weight: 600;
     color: #4f6f4f !important;
     letter-spacing: 0.5px;
 }
@@ -232,7 +238,8 @@
     border: none;
     border-radius: 4px;
     font-family: 'Jost', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
     letter-spacing: 3px;
     text-transform: uppercase;
     cursor: pointer;
@@ -249,7 +256,8 @@
     display: block;
     text-align: center;
     margin-top: 14px;
-    font-size: 0.78rem;
+    font-size: 0.82rem;
+    font-weight: 500;
     color: var(--muted);
     text-decoration: none;
     letter-spacing: 0.5px;
@@ -307,14 +315,15 @@
 }
 
 #payment-toast .pt-title {
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 2px;
 }
 
 #payment-toast .pt-sub {
-    font-size: 0.78rem;
+    font-size: 0.82rem;
+    font-weight: 500;
     color: #666;
 }
 
