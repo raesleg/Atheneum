@@ -1,15 +1,16 @@
 <?php
-session_start(); // need this to log out the user and destroy the session
-// Unset all session variables
-session_unset();
+session_start();
+$username = $_SESSION['username'] ?? null;
 
-// Destroy the session
+session_unset();
 session_destroy();
-if (isset($_SESSION['loggedin'])) {
-    $_SESSION['loggedin'] = false;
-    
+
+// Start a fresh session just to show toast message
+session_start();
+if ($username) {
+    $_SESSION['alert'] = "You've been logged out. See you soon, " . htmlspecialchars($username) . "!";
 }
-header("Location: login.php");
+
+header("Location: index.php");
 exit();
-//echo "You have been logged out."
 ?>

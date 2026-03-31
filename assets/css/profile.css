@@ -32,13 +32,14 @@
     color: var(--navy);
 }
 
-#profileImg{
-    width: 100%;
-    max-width: 200px; /* optional max size */
-    aspect-ratio: 1/1; /* keeps square ratio */
+#profileImg {
+    width: 120px;
+    height: 120px;
     object-fit: cover;
     border-radius: 50%;
-    border: 2px solid #ddd;
+    border: 2px solid var(--line);
+    display: block;
+    margin: 0 auto;
 }
 
 .btn-primary {

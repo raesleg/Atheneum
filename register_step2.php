@@ -118,9 +118,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($success) {
             unset($_SESSION['reg_data']);
             session_regenerate_id(true);
-            $_SESSION['register_attempts'] += 1;
-            $_SESSION['alert'] = "Account created successfully. Please login";
-            header("Location: login.php");
+            // Auto-login the new user
+            $_SESSION['userId']   = $GLOBALS['newUserId'];
+            $_SESSION['username'] = $username;
+            $_SESSION['role']     = 'user';
+            $_SESSION['alert']    = "Welcome to Atheneum! Start browsing our collection.";
+            header("Location: index.php");
             exit();
         }
     }
@@ -138,25 +141,29 @@ function saveMemberToDB() {
         return;
     }
 
-    // Check duplicate username or email
-    $checkStmt = $conn->prepare("SELECT username FROM Users WHERE username = ? OR email = ?");
-    if (!$checkStmt) {
-        $errorMsg[] = "Prepare failed: " . $conn->error;
+    // Check duplicate username
+    $checkUser = $conn->prepare("SELECT userId FROM Users WHERE username = ?");
+    $checkUser->bind_param("s", $username);
+    $checkUser->execute();
+    $checkUser->store_result();
+    if ($checkUser->num_rows > 0) {
+        $errorMsg[] = "Username already taken. Please choose another.";
         $success = false;
-        return;
     }
+    $checkUser->close();
 
-    $checkStmt->bind_param("ss", $username, $email);
-    $checkStmt->execute();
-    $checkStmt->store_result();
-
-    if ($checkStmt->num_rows > 0) {
-        $errorMsg[] = "Username already exists.";
+    // Check duplicate email
+    $checkEmail = $conn->prepare("SELECT userId FROM Users WHERE email = ?");
+    $checkEmail->bind_param("s", $email);
+    $checkEmail->execute();
+    $checkEmail->store_result();
+    if ($checkEmail->num_rows > 0) {
+        $errorMsg[] = "An account with this email already exists.";
         $success = false;
-        $checkStmt->close();
-        return;
     }
-    $checkStmt->close();
+    $checkEmail->close();
+
+    if (!$success) return;
 
     // Insert new user
     $stmt = $conn->prepare("
@@ -175,6 +182,9 @@ function saveMemberToDB() {
     if (!$stmt->execute()) {
         $errorMsg[] = "Execute failed: " . $stmt->error;
         $success = false;
+    } else {
+        // Return new userId for auto-login
+        $GLOBALS['newUserId'] = $conn->insert_id;
     }
 
     $stmt->close();
@@ -197,21 +207,46 @@ function saveMemberToDB() {
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div id="step2">
                     <div class="mb-3 text-center">
-                    <img id="imgPreview" src="assets/images/default-avatar.jpg" alt="Profile Preview">
+                        <div id="avatarPlaceholder" style="width:100px;height:100px;border-radius:50%;background:var(--bg);border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                            <i class="bi bi-person" style="font-size:2.5rem;color:var(--muted);"></i>
+                        </div>
+                        <img id="imgPreview" src="" alt="Profile Preview"
+                             style="display:none;width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto;">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="profile_pic">Select Image (JPG, PNG):</label>
-                        <input class="form-control" type="file" id="profile_pic" name="profile_pic" 
-                        accept="image/*">
+                        <label class="form-label" for="profile_pic">
+                            Profile Photo <span style="color:var(--muted);font-weight:400;">(optional)</span>
+                        </label>
+                        <input class="form-control" type="file" id="profile_pic" name="profile_pic"
+                               accept="image/jpeg,image/png"
+                               onchange="previewImage(this)">
+                        <p style="font-size:0.75rem;color:var(--muted);margin-top:4px;">JPG or PNG, max 2MB. Leave blank to use the default avatar.</p>
                     </div>
                     <div class="g-recaptcha text-center" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div>
                     <div class="mb-3 d-flex justify-content-between">
                         <a href="register.php" class="btn btn-secondary">Back</a>
-                        <!-- <div class="g-recaptcha" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div> -->
                         <button class="btn btn-success" type="submit">Register</button>
                     </div>
                 </div>
+                <script>
+                function previewImage(input) {
+                    const placeholder = document.getElementById('avatarPlaceholder');
+                    const preview = document.getElementById('imgPreview');
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = e => {
+                            preview.src = e.target.result;
+                            preview.style.display = 'block';
+                            placeholder.style.display = 'none';
+                        };
+                        reader.readAsDataURL(input.files[0]);
+                    } else {
+                        preview.style.display = 'none';
+                        placeholder.style.display = 'flex';
+                    }
+                }
+                </script>
             </form>
             <div>Already have an account? <a href="login.php">Sign in here! </a>
             </div>

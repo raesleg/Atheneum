@@ -91,6 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($success) {
+            $_SESSION['alert'] = "Welcome back, " . htmlspecialchars($username) . "!";
             session_write_close();
             if ($_SESSION['role'] === 'admin') {
                 header("Location: admin/dashboard.php");
@@ -137,7 +138,7 @@ function authenticateUser($conn) { // receives $conn
             $_SESSION['login_attempts'] += 1;
         } else {
             session_regenerate_id(true);
-            $_SESSION['userId'] = $row['userId']; // add this for cart queries
+            $_SESSION['userId'] = $row['userId']; // added for cart queries
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $row['role'];
             $_SESSION['loggedin'] = true;
