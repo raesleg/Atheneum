@@ -121,6 +121,21 @@ if ($event->type === 'checkout.session.completed') {
             $insertItem->execute();
         }
 
+        // Decrement product stock
+        $deductStock = $conn->prepare("
+            UPDATE Products 
+            SET quantity = GREATEST(0, quantity - ?) 
+            WHERE productId = ?
+        ");
+
+        foreach ($cartItems as $item) {
+            $productId = (int)$item['productId'];
+            $quantity  = (int)$item['quantity'];
+            $deductStock->bind_param("ii", $quantity, $productId);
+            $deductStock->execute();
+        }
+        $deductStock->close();
+
         // refresh cart
         $clearCart = $conn->prepare("DELETE FROM Cart WHERE userId = ?");
         $clearCart->bind_param("i", $userId);

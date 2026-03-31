@@ -1,4 +1,5 @@
 <?php
+session_start(); // need this to log out the user and destroy the session
 // Unset all session variables
 session_unset();
 
