@@ -1,7 +1,10 @@
 <?php
 $pageTitle = "Book Details";
 $extraCSS  = ["assets/css/book.css"];
-$extraJS   = [["src" => "assets/js/review.js", "defer" => true]];
+$extraJS   = [
+    ["src" => "assets/js/review.js", "defer" => true],
+    ["src" => "assets/js/book.js","defer" => true],
+];
 
 include 'inc/conn.php';
 include 'inc/header.php';
@@ -54,7 +57,7 @@ $starCounts   = [
 $stmtReviews = $conn->prepare("
     SELECT r.rating, r.comment, r.created_at, u.username, u.fname, u.lname
     FROM Reviews r
-    JOIN Users u ON r.username = u.username
+    JOIN Users u ON r.userId = u.userId
     WHERE r.productId = ?
     ORDER BY r.created_at DESC
 ");
@@ -68,8 +71,8 @@ $alreadyReviewed = false;
 $reviewEligibleOrderId = null;
 
 if ($isLoggedIn) {
-    $stmtCheck = $conn->prepare("SELECT reviewId FROM Reviews WHERE username = ? AND productId = ?");
-    $stmtCheck->bind_param("si", $username, $productId);
+    $stmtCheck = $conn->prepare("SELECT reviewId FROM Reviews WHERE userId = ? AND productId = ?");
+    $stmtCheck->bind_param("ii", $userId, $productId);
     $stmtCheck->execute();
     if ($stmtCheck->get_result()->num_rows > 0) {
         $alreadyReviewed = true;
@@ -82,14 +85,14 @@ if ($isLoggedIn) {
             FROM Orders o
             JOIN OrderItems oi ON o.orderId = oi.orderId
             JOIN OrderShipments s ON o.orderId = s.orderId
-            WHERE o.username = ?
+            WHERE o.userId = ?
               AND oi.productId = ?
               AND o.paymentStatus = 'paid'
               AND s.currentStatus = 'delivered'
               AND s.delivered_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
             LIMIT 1
         ");
-        $stmtEligible->bind_param("sii", $username, $productId, $REVIEW_WINDOW_DAYS);
+        $stmtEligible->bind_param("iii", $userId, $productId, $REVIEW_WINDOW_DAYS);
         $stmtEligible->execute();
         $eligibleRow = $stmtEligible->get_result()->fetch_assoc();
         if ($eligibleRow) {
@@ -152,8 +155,10 @@ if ($isLoggedIn) {
                 </p>
 
                 <?php if ($isLoggedIn && $book['quantity'] > 0): ?>
-                    <button class="add-to-cart-btn" id="addToCartBtn" 
+                    <button class="add-to-cart-btn" id="addToCartBtn"
                             data-product-id="<?= $productId ?>"
+                            data-book-title="<?= htmlspecialchars($book['title'], ENT_QUOTES) ?>"
+                            data-book-cover="<?= htmlspecialchars($book['cover_image'] ?? '', ENT_QUOTES) ?>"
                             aria-label="Add <?= htmlspecialchars($book['title']) ?> to cart">
                         <i class="bi bi-bag-plus" aria-hidden="true"></i> Add to Cart
                     </button>
@@ -288,36 +293,5 @@ if ($isLoggedIn) {
         </div>
     </section>
 </main>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var btn = document.getElementById('addToCartBtn');
-    if (btn) {
-        btn.addEventListener('click', function() {
-            var pid = this.dataset.productId;
-            fetch('process_cart.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'add', productId: parseInt(pid), qty: 1 })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    var badge = document.getElementById('cart-count');
-                    if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
-                    btn.innerHTML = '<i class="bi bi-check-lg" aria-hidden="true"></i> Added!';
-                    btn.setAttribute('aria-label', 'Added to cart');
-                    btn.classList.add('added');
-                    setTimeout(function() {
-                        btn.innerHTML = '<i class="bi bi-bag-plus" aria-hidden="true"></i> Add to Cart';
-                        btn.setAttribute('aria-label', 'Add to cart');
-                        btn.classList.remove('added');
-                    }, 2000);
-                }
-            });
-        });
-    }
-});
-</script>
 
 <?php include 'inc/footer.php'; ?>

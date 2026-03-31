@@ -466,3 +466,113 @@
     outline-offset: 0;
     border-color: var(--navy-mid);
 }
+
+/* Add to cart TOAST */
+#cart-toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    padding: 14px 18px;
+    min-width: 290px;
+    max-width: 340px;
+    border-left: 4px solid var(--gold, #b8963e);
+    transform: translateX(calc(100% + 48px));
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+#cart-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+#cart-toast .toast-thumb {
+    width: 44px;
+    height: 58px;
+    object-fit: cover;
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+
+#cart-toast .toast-thumb-fallback {
+    width: 44px;
+    height: 58px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    background: #f5f0e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--gold, #b8963e);
+}
+
+#cart-toast .toast-body {
+    flex: 1;
+    min-width: 0;
+}
+
+#cart-toast .toast-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--gold, #b8963e);
+    margin-bottom: 3px;
+}
+
+#cart-toast .toast-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#cart-toast .toast-sub {
+    font-size: 0.74rem;
+    color: #888;
+    margin-top: 3px;
+}
+
+#cart-toast .toast-sub a {
+    color: var(--gold, #b8963e);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#cart-toast .toast-sub a:hover {
+    text-decoration: underline;
+}
+
+#cart-toast .toast-check {
+    color: #2e7d32;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+#cart-toast .toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--gold, #b8963e);
+    transform-origin: left center;
+    transform: scaleX(1);
+}
+
+#cart-toast.show .toast-progress {
+    transition: transform 3s linear;
+    transform: scaleX(0);
+}

@@ -20,9 +20,9 @@ $stmt = $conn->prepare("
     SELECT o.orderId, o.paymentStatus, s.*
     FROM Orders o
     LEFT JOIN OrderShipments s ON o.orderId = s.orderId
-    WHERE o.orderId = ? AND o.username = ?
+    WHERE o.orderId = ? AND o.userId = ?
 ");
-$stmt->bind_param("is", $orderId, $username);
+$stmt->bind_param("ii", $orderId, $userId);
 $stmt->execute();
 $row = $stmt->get_result()->fetch_assoc();
 $stmt->close();

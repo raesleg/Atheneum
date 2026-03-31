@@ -18,10 +18,10 @@ $stmt = $conn->prepare("
            s.currentStatus AS shipmentStatus, s.delivered_at
     FROM Orders o
     LEFT JOIN OrderShipments s ON o.orderId = s.orderId
-    WHERE o.username = ?
+    WHERE o.userId = ?
     ORDER BY o.created_at DESC
 ");
-$stmt->bind_param("s", $username);
+$stmt->bind_param("i", $userId);
 $stmt->execute();
 $orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();

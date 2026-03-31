@@ -21,7 +21,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </a>
 
         <!-- Mobile Toggle -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+        <button class="navbar-toggler" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -40,18 +46,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                        href="<?= $baseUrl ?>/about.php">ABOUT US</a>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle <?= in_array($currentPage, ['products.php','book.php']) ? 'active-link' : '' ?>"
-                       href="#" role="button" data-bs-toggle="dropdown">
-                        SHOP
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/products.php">All Books</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/products.php?genre=Fiction+%26+Literature">Fiction &amp; Literature</a></li>
-                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/products.php?genre=Non-Fiction+%26+Self+Help">Non-Fiction &amp; Self Help</a></li>
-                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/products.php?genre=Science+%26+Technology">Science &amp; Technology</a></li>
-                    </ul>
+                <li class="nav-item">
+                    <a class="nav-link <?= $currentPage === 'products.php' ? 'active-link' : '' ?>"
+                       href="<?= $baseUrl ?>/products.php">SHOP</a>
                 </li>
 
                 <li class="nav-item">
@@ -78,14 +75,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <!-- Right Icons -->
             <div class="nav-icons d-flex align-items-center gap-3">
                 <a href="<?= $baseUrl ?>/products.php" class="icon-link">
-                    <i class="bi bi-search"></i>
-                    <span class="visually-hidden">Search products</span>
+                    <i class="bi bi-search" aria-hidden="true"></i>
                 </a>
 
                 <?php if ($isLoggedIn): ?>
                     <a href="<?= $baseUrl ?>/cart.php" class="icon-link position-relative">
                         <i class="bi bi-bag"></i>
-                        <span class="badge-circle" id="cart-count"><?= $cartCount ?></span>
                     </a>
 
                     <div class="dropdown">
