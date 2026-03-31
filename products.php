@@ -203,9 +203,9 @@ $totalAllBooks = array_sum($genreCounts);
         </div>
 
         <?php else: ?>
-        <div class="books-grid" role="list">
+        <div class="books-grid">
             <?php foreach ($books as $b): ?>
-            <article class="book-card" role="listitem">
+            <article class="book-card">
                 <a href="<?= $baseUrl ?>/book.php?id=<?= $b['productId'] ?>" class="book-card-cover-link"
                    aria-label="<?= htmlspecialchars($b['title']) ?> by <?= htmlspecialchars($b['author']) ?>">
                     <div class="book-card-cover" aria-hidden="true">

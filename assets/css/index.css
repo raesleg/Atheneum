@@ -31,15 +31,18 @@
 
 /* ── Hero ── */
 .hero-section {
-    background: #fff;
+    background: linear-gradient(155deg, #faf8f4 0%, #fff 55%);
     border-bottom: 1px solid var(--line);
-    padding: 4rem 0 3rem;
+    padding: clamp(3.5rem, 7vh, 6rem) 0;
 }
 .hero-inner {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 3.5rem;
     align-items: center;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 @media (max-width: 900px) {
     .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -56,7 +59,7 @@
 }
 .hero-heading {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-size: clamp(2.6rem, 4.5vw, 4.5rem);
     font-weight: 400;
     color: var(--navy);
     line-height: 1.12;
@@ -67,7 +70,7 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 1rem;
     color: var(--muted);
-    max-width: 420px;
+    max-width: 520px;
     margin-bottom: 1.75rem;
     line-height: 1.75;
 }
@@ -112,7 +115,7 @@
 
 /* ── Carousel ── */
 .hero-carousel-wrap { position: relative; }
-.hero-carousel { position: relative; min-height: 380px; }
+.hero-carousel { position: relative; min-height: clamp(380px, 45vh, 520px); }
 .hero-slide {
     position: absolute; top: 0; left: 0; width: 100%;
     opacity: 0; pointer-events: none;
@@ -120,11 +123,11 @@
 }
 .hero-slide.active { opacity: 1; pointer-events: auto; position: relative; }
 .hero-slide a {
-    display: flex; gap: 1.5rem; align-items: flex-start;
+    display: flex; gap: 1.5rem; align-items: center;
     text-decoration: none;
 }
 .hero-book-cover {
-    width: 220px; min-width: 220px;
+    width: clamp(200px, 22vw, 320px); min-width: 160px;
     aspect-ratio: 2/3;
     border-radius: 8px; overflow: hidden;
     box-shadow: 4px 8px 28px rgba(26,44,91,0.18);

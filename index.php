@@ -24,6 +24,7 @@ foreach ($genres as $g) {
 $totalBooks = $conn->query("SELECT COUNT(*) AS c FROM Products")->fetch_assoc()['c'];
 ?>
 
+<main>
 <!-- HERO — slideshow + CTA -->
 <section class="hero-section" aria-label="Featured books slideshow">
     <div class="hero-inner container-fluid px-4 px-lg-5">
@@ -181,9 +182,9 @@ foreach ($featuredByGenre as $gName => $books):
         </div>
         <hr class="section-rule" aria-hidden="true">
 
-        <div class="books-grid" role="list">
+        <div class="books-grid">
             <?php foreach ($books as $b): ?>
-            <article class="book-card" role="listitem">
+            <article class="book-card">
                 <a href="<?= $baseUrl ?>/book.php?id=<?= $b['productId'] ?>" class="book-card-cover-link"
                    aria-label="<?= htmlspecialchars($b['title']) ?> by <?= htmlspecialchars($b['author']) ?>">
                     <div class="book-card-cover" aria-hidden="true">
@@ -259,6 +260,7 @@ foreach ($featuredByGenre as $gName => $books):
         </a>
     </div>
 </section>
+</main>
 
 <!-- Slideshow JS -->
 <script>

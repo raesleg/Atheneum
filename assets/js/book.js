@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             showToast(bookTitle, bookCover);
+            updateCartBadge(1);
         })
         .catch(function (err) {
             btn.disabled = false;
@@ -85,6 +86,15 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(function () {
             if (toast && toast.parentNode) toast.remove();
         }, 400);
+    }
+
+    function updateCartBadge(delta) {
+        var badge = document.getElementById('cart-count');
+        if (!badge) return;
+        var current = parseInt(badge.textContent) || 0;
+        var next = current + delta;
+        badge.textContent = next;
+        badge.style.display = next > 0 ? 'flex' : 'none';
     }
 
     function escapeHtml(str) {

@@ -81,6 +81,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <?php if ($isLoggedIn): ?>
                     <a href="<?= $baseUrl ?>/cart.php" class="icon-link position-relative">
                         <i class="bi bi-bag"></i>
+                        <?php if ($cartCount > 0): ?>
+                            <span class="badge-circle" id="cart-count"><?= (int)$cartCount ?></span>
+                        <?php else: ?>
+                            <span class="badge-circle" id="cart-count" style="display:none">0</span>
+                        <?php endif; ?>
                     </a>
 
                     <div class="dropdown">

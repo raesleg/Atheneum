@@ -267,7 +267,7 @@ if ($isLoggedIn) {
                     <?php else: ?>
                         <?php foreach ($reviews as $rev): ?>
                         <?php $reviewerName = htmlspecialchars($rev['fname'] ? $rev['fname'] . ' ' . $rev['lname'] : $rev['username']); ?>
-                        <article class="review-card" role="listitem" aria-label="Review by <?= $reviewerName ?>, <?= $rev['rating'] ?> out of 5 stars">
+                        <article class="review-card" aria-label="Review by <?= $reviewerName ?>, <?= $rev['rating'] ?> out of 5 stars">
                             <div class="review-header">
                                 <i class="bi bi-person-circle review-avatar" aria-hidden="true"></i>
                                 <div>
