@@ -27,6 +27,11 @@ $stmt = $conn->prepare("
     LEFT JOIN OrderShipments s ON o.orderId = s.orderId
     WHERE o.orderId = ? AND o.userId = ?
 ");
+$userId = $_SESSION['userId'] ?? null;
+if (!$userId) {
+    header("Location: login.php");
+    exit();
+}
 $stmt->bind_param("ii", $orderId, $userId);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
@@ -59,8 +64,8 @@ if ($shipmentStatus === 'delivered' && $order['delivered_at']) {
 
     if ($daysSince <= $REVIEW_WINDOW_DAYS) {
         foreach ($items as $item) {
-            $stmtRev = $conn->prepare("SELECT reviewId FROM Reviews WHERE username = ? AND productId = ?");
-            $stmtRev->bind_param("si", $username, $item['productId']);
+            $stmtRev = $conn->prepare("SELECT reviewId FROM Reviews WHERE userId = ? AND productId = ?");
+            $stmtRev->bind_param("ii", $userId, $item['productId']);
             $stmtRev->execute();
             $hasReview = $stmtRev->get_result()->num_rows > 0;
             $stmtRev->close();
