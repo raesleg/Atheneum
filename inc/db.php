@@ -5,7 +5,7 @@ function getDBConnection() {
     $serverPath = '/var/www/private/db-config.ini';
     $configPath = file_exists($localPath) ? $localPath : $serverPath;
 
-    $config = parse_ini_file($serverPath);
+    $config = parse_ini_file($configPath);
     if (!$config) {
         die("Database config file not found.");
     }

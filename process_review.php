@@ -5,6 +5,7 @@ include 'inc/conn.php';
 require_once 'config/shipment_config.php';
 
 $username = $_SESSION['username'] ?? null;
+$userId = $_SESSION['userId'] ?? null;
 
 if (!$username) {
     echo json_encode(['success' => false, 'error' => 'You must be logged in.']);
@@ -41,8 +42,8 @@ if (empty($comment)) {
     $comment = null;
 }
 
-$stmtCheck = $conn->prepare("SELECT reviewId FROM Reviews WHERE username = ? AND productId = ?");
-$stmtCheck->bind_param("si", $username, $productId);
+$stmtCheck = $conn->prepare("SELECT reviewId FROM Reviews WHERE userId = ? AND productId = ?");
+$stmtCheck->bind_param("ii", $userId, $productId);
 $stmtCheck->execute();
 if ($stmtCheck->get_result()->num_rows > 0) {
     echo json_encode(['success' => false, 'error' => 'You have already reviewed this book.']);
@@ -75,10 +76,10 @@ if (!$eligible) {
 }
 
 $stmtInsert = $conn->prepare("
-    INSERT INTO Reviews (productId, username, orderId, rating, comment)
+    INSERT INTO Reviews (productId, userId, orderId, rating, comment)
     VALUES (?, ?, ?, ?, ?)
 ");
-$stmtInsert->bind_param("isiis", $productId, $username, $orderId, $rating, $comment);
+$stmtInsert->bind_param("iiiis", $productId, $userId, $orderId, $rating, $comment);
 
 if ($stmtInsert->execute()) {
     $stmtUser = $conn->prepare("SELECT fname, lname FROM Users WHERE username = ?");
