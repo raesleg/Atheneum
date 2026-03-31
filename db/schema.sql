@@ -112,3 +112,22 @@ CREATE TABLE IF NOT EXISTS FAQ (
     INDEX idx_faq_category (category),
     INDEX idx_faq_order    (display_order)
 );
+
+CREATE TABLE IF NOT EXISTS Refund (
+    refundId    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    orderId     INT UNSIGNED NOT NULL,
+    userId      INT UNSIGNED NOT NULL,
+    reason      TEXT         NOT NULL,
+    status      ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+    admin_note  TEXT         NULL,
+    resolved_by INT UNSIGNED NULL,
+    resolved_at DATETIME     NULL,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ 
+    PRIMARY KEY (refundId),
+    CONSTRAINT fk_refund_order    FOREIGN KEY (orderId)  REFERENCES Orders(orderId)  ON DELETE CASCADE,
+    CONSTRAINT fk_refund_user     FOREIGN KEY (userId)   REFERENCES Users(userId)    ON DELETE CASCADE,
+    CONSTRAINT fk_refund_resolver FOREIGN KEY (resolved_by) REFERENCES Users(userId) ON DELETE SET NULL,
+ 
+    UNIQUE KEY uq_refund_order (orderId)
+);
