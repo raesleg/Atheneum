@@ -42,6 +42,14 @@ if (!$order) {
     exit();
 }
 
+// Refund logic to fetch details from the Refund table
+$refundInfo = null;
+$stmtRef = $conn->prepare("SELECT status, reason, admin_note, created_at FROM Refund WHERE orderId = ?");
+$stmtRef->bind_param("i", $orderId);
+$stmtRef->execute();
+$refundInfo = $stmtRef->get_result()->fetch_assoc();
+$stmtRef->close();
+
 $stmtItems = $conn->prepare("
     SELECT oi.*, p.title, p.author, p.cover_image
     FROM OrderItems oi
@@ -103,6 +111,22 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
             </span>
         </div>
 
+        <?php 
+        // Refund logic to display an alert if a refund has been requested
+        if ($refundInfo): ?>
+            <div class="alert <?= $refundInfo['status'] === 'approved' ? 'alert-success' : ($refundInfo['status'] === 'rejected' ? 'alert-danger' : 'alert-warning') ?> shadow-sm border-0 mb-4" role="alert" style="border-radius: 12px; padding: 1.5rem;">
+                <h5 class="alert-heading fw-bold mb-2">Refund Request: <?= ucfirst($refundInfo['status']) ?></h5>
+                <p class="mb-1"><strong>Reason:</strong> <?= htmlspecialchars($refundInfo['reason']) ?></p>
+                <?php if (!empty($refundInfo['admin_note'])): ?>
+                    <hr style="opacity: 0.1;">
+                    <p class="mb-0"><strong>Message from Atheneum:</strong> <?= htmlspecialchars($refundInfo['admin_note']) ?></p>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php 
+        // Refund logic to hide the tracker if the order is refunded
+        if ($order['paymentStatus'] !== 'refunded'): ?>
         <section class="shipment-tracker" id="shipmentTracker" 
                  data-order-id="<?= $orderId ?>"
                  data-current-status="<?= htmlspecialchars($shipmentStatus) ?>"
@@ -165,6 +189,7 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
                      onerror="this.parentElement.innerHTML='<div class=\'transit-placeholder\'><i class=\'bi bi-truck\' aria-hidden=\'true\'></i><span>Your package is on its way!</span></div>'">
             </div>
         </section>
+        <?php endif; ?>
 
         <section class="order-items-section" aria-labelledby="items-heading">
             <h2 class="section-heading" id="items-heading">Items in this Order</h2>

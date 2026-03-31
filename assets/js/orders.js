@@ -17,6 +17,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (data) {
                 if (!data.success) return;
 
+                // If order has been refunded, stop polling and refresh the page to show refund details
+                if (data.isRefunded) {
+                    clearInterval(pollTimer);
+                    location.reload();
+                    return;
+                }
+
                 if (data.status !== currentStatus) {
                     currentStatus = data.status;
                     updateTrackerUI(data);

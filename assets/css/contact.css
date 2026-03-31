@@ -116,3 +116,7 @@
     transition: background 0.2s ease, color 0.2s ease;
 }
 .btn-hero-primary:hover { background: var(--navy-mid); color: #fff; }
+ 
+ .refund-box {
+     margin-bottom: 1.1rem;
+ }

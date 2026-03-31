@@ -15,9 +15,11 @@ if (!$isLoggedIn) {
 
 $stmt = $conn->prepare("
     SELECT o.orderId, o.totalPrice, o.created_at, o.orderStatus, o.paymentStatus,
-           s.currentStatus AS shipmentStatus, s.delivered_at
+           s.currentStatus AS shipmentStatus, s.delivered_at,
+           r.status AS refundStatus -- [REFUND-LOGIC] Added refundStatus
     FROM Orders o
     LEFT JOIN OrderShipments s ON o.orderId = s.orderId
+    LEFT JOIN Refund r ON o.orderId = r.orderId -- [REFUND-LOGIC] Joined Refund table
     WHERE o.userId = ?
     ORDER BY o.created_at DESC
 ");
@@ -44,8 +46,12 @@ $stmt->close();
             <div role="list" aria-label="Your orders">
             <?php foreach ($orders as $order): ?>
                 <?php
-                    $statusLabel = $STATUS_LABELS[$order['shipmentStatus'] ?? 'order_placed'] ?? 'Processing';
-                    $statusClass = str_replace('_', '-', $order['shipmentStatus'] ?? 'order-placed');
+                    // [REFUND-LOGIC] Check if order is fully refunded or rejected
+                    $isRefunded  = ($order['paymentStatus'] === 'refunded');
+                    $isRejected  = ($order['refundStatus'] === 'rejected');
+                    
+                    $statusLabel = $isRefunded ? 'Refunded' : ($STATUS_LABELS[$order['shipmentStatus'] ?? 'order_placed'] ?? 'Processing');
+                    $statusClass = $isRefunded ? 'refunded' : str_replace('_', '-', $order['shipmentStatus'] ?? 'order-placed');
                     $statusIdx   = array_search($order['shipmentStatus'] ?? 'order_placed', $STATUS_ORDER);
                 ?>
                 <div class="order-card" role="listitem" aria-label="Order #<?= $order['orderId'] ?>, <?= htmlspecialchars($statusLabel) ?>, total $<?= number_format($order['totalPrice'], 2) ?>">
@@ -59,9 +65,19 @@ $stmt->close();
                         <div class="order-header-right">
                             <span class="order-total" aria-label="Total: $<?= number_format($order['totalPrice'], 2) ?>">$<?= number_format($order['totalPrice'], 2) ?></span>
                             <span class="status-pill <?= $statusClass ?>"><?= htmlspecialchars($statusLabel) ?></span>
+                            <?php 
+                                // [REFUND-LOGIC] Show additional pills for pending or rejected refunds
+                                if ($isRejected): ?>
+                                <span class="status-pill refund-rejected" aria-label="Refund request rejected">Refund Rejected</span>
+                            <?php elseif ($order['refundStatus'] === 'pending'): ?>
+                                <span class="status-pill refund-pending" aria-label="Refund request pending">Refund Pending</span>
+                            <?php endif; ?>
                         </div>
                     </div>
 
+                    <?php 
+                    // [REFUND-LOGIC] Hide tracker if refunded
+                    if (!$isRefunded): ?>
                     <div class="mini-tracker" role="progressbar" 
                          aria-valuenow="<?= $statusIdx + 1 ?>" 
                          aria-valuemin="1" 
@@ -76,6 +92,7 @@ $stmt->close();
                             </div>
                         <?php endforeach; ?>
                     </div>
+                    <?php endif; // [REFUND-LOGIC] Close if (!$isRefunded) ?>
 
                     <div class="order-card-footer">
                         <a href="order_detail.php?id=<?= $order['orderId'] ?>" class="view-details-btn" aria-label="View details for order #<?= $order['orderId'] ?>">
