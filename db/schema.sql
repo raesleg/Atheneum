@@ -44,6 +44,20 @@ CREATE TABLE IF NOT EXISTS Cart (
     CONSTRAINT uq_cart_user_product UNIQUE (userId, productId)
 );
 
+CREATE TABLE IF NOT EXISTS Addresses (
+    addressId INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    userId INT UNSIGNED NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100),
+    postal_code VARCHAR(20) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(userId) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS Orders (
     orderId         INT UNSIGNED  AUTO_INCREMENT PRIMARY KEY,
     username        VARCHAR(45)   NOT NULL,

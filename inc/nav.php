@@ -79,6 +79,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <div class="nav-icons d-flex align-items-center gap-3">
                 <a href="<?= $baseUrl ?>/products.php" class="icon-link">
                     <i class="bi bi-search"></i>
+                    <span class="visually-hidden">Search products</span>
                 </a>
 
                 <?php if ($isLoggedIn): ?>

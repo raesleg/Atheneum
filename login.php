@@ -10,11 +10,16 @@ $extraJS = [
 include 'inc/conn.php'; 
 include 'inc/header.php';
 
-
+if ($isLoggedIn) {
+    header("Location: index.php");
+    exit();
+}
 //CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+
+
 $alertMsg = "";
 $errorMsg = [];
 $success = true;
@@ -44,7 +49,7 @@ if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
 
 // Check if user is temporarily blocked
 if ($_SESSION['login_attempts'] >= $maxAttempts) {
-    die("Too many login attempts. Please try again after"+$timeWindow/60+ "minutes.");
+    die("Too many login attempts. Please try again after". $timeWindow/60 . "minutes.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

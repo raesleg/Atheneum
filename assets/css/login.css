@@ -1,4 +1,4 @@
-/* FOR LOGIN, REGISTER, PROFILE */
+/* FOR LOGIN, REGISTER */
 * { box-sizing: border-box; }
 
 .card {
@@ -8,7 +8,7 @@
   border: none;
   width: 40rem;
   align-items: center;
-  padding: 20px 4px 26px;
+  padding: 20px 10px 26px;
 }
 .card-header{
   padding: 24px 0px 36px;
@@ -28,29 +28,6 @@
   margin-top: 2em;
 }
 
-.profile {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 50px;
-  width: auto;
-  justify-content: center;
-}
-
-.profile-details {
-  width: 50%;
-  padding: 30px;
-}
-
-.profile-details label{
-  font-weight: bold;;
-}
-
-.profile-title{
-  padding: 30px 10px 20px;
-  font-size:x-large;
-  font-weight: bold;;
-}
-
 .error{
   color: red;
   text-align: center;
@@ -65,4 +42,36 @@
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
+}
+
+#imgPreview{
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
+.btn-primary, .btn-secondary, .btn-success{
+    display: inline-flex; 
+    align-items: center; 
+    gap: 0.45rem;
+    background: var(--navy); 
+    color: #fff;
+    font-family: 'DM Sans', sans-serif; 
+    font-size: 0.88rem; 
+    font-weight: 600;
+    letter-spacing: 0.05em; 
+    text-transform: uppercase;
+    padding: 0.7rem 1rem; 
+    border: none; 
+    border-radius: 4px;
+    cursor: pointer; 
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary:hover { 
+    background: var(--navy-mid); 
+    color: #fff; 
 }
