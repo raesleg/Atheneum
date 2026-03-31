@@ -66,6 +66,19 @@ $stmtReviews->execute();
 $reviews = $stmtReviews->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmtReviews->close();
 
+// Filter related books (same genre, exclude current)
+$stmtRelated = $conn->prepare("
+    SELECT productId, title, author, price, cover_image
+    FROM Products
+    WHERE genre = ? AND productId != ?
+    ORDER BY RAND()
+    LIMIT 6
+");
+$stmtRelated->bind_param("si", $book['genre'], $productId);
+$stmtRelated->execute();
+$relatedBooks = $stmtRelated->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmtRelated->close();
+
 $canReview     = false;
 $alreadyReviewed = false;
 $reviewEligibleOrderId = null;
@@ -128,7 +141,7 @@ if ($isLoggedIn) {
                 <h1 class="book-title-lg"><?= htmlspecialchars($book['title']) ?></h1>
                 <p class="book-author-lg">by <?= htmlspecialchars($book['author']) ?></p>
 
-                <div class="inline-rating" aria-label="Average rating: <?= $avgRating ?> out of 5 stars, based on <?= $totalReviews ?> review<?= $totalReviews !== 1 ? 's' : '' ?>">
+                <div class="inline-rating" role="img" aria-label="Average rating: <?= $avgRating ?> out of 5 stars, based on <?= $totalReviews ?> review<?= $totalReviews !== 1 ? 's' : '' ?>">
                     <div class="stars-display" aria-hidden="true">
                         <?php for ($i = 1; $i <= 5; $i++): ?>
                             <?php if ($i <= floor($avgRating)): ?>
@@ -173,7 +186,7 @@ if ($isLoggedIn) {
         <h2 class="reviews-heading" id="reviews-heading">Customer Reviews</h2>
 
         <div class="reviews-layout">
-            <aside class="rating-summary" aria-label="Rating summary">
+            <div class="rating-summary" aria-label="Rating summary" role="group">
                 <div class="avg-rating-big" aria-hidden="true">
                     <span class="big-number"><?= $avgRating ?></span>
                     <span class="out-of">out of 5</span>
@@ -203,7 +216,7 @@ if ($isLoggedIn) {
                         </div>
                     <?php endfor; ?>
                 </div>
-            </aside>
+            </div>
 
             <div class="reviews-list-col">
 
@@ -292,6 +305,37 @@ if ($isLoggedIn) {
             </div>
         </div>
     </section>
+
+    <?php if (!empty($relatedBooks)): ?>
+    <section class="related-section" aria-labelledby="related-heading">
+        <div class="container-fluid px-4 px-lg-5">
+            <p class="section-eyebrow">More Like This</p>
+            <h2 class="section-heading" id="related-heading">You Might Enjoy</h2>
+            <hr class="section-rule">
+            <div class="related-grid">
+                <?php foreach ($relatedBooks as $rb): ?>
+                <a href="<?= $baseUrl ?>/book.php?id=<?= $rb['productId'] ?>" class="related-card"
+                   aria-label="<?= htmlspecialchars($rb['title']) ?> by <?= htmlspecialchars($rb['author']) ?>">
+                    <div class="related-cover" aria-hidden="true">
+                        <?php if (!empty($rb['cover_image'])): ?>
+                        <img src="<?= htmlspecialchars($rb['cover_image']) ?>"
+                             alt=""
+                             loading="lazy"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="related-placeholder" style="display:none"><i class="bi bi-book"></i></div>
+                        <?php else: ?>
+                        <div class="related-placeholder"><i class="bi bi-book"></i></div>
+                        <?php endif; ?>
+                    </div>
+                    <p class="related-title"><?= htmlspecialchars($rb['title']) ?></p>
+                    <p class="related-author">by <?= htmlspecialchars($rb['author']) ?></p>
+                    <p class="related-price">$<?= number_format($rb['price'], 2) ?></p>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 </main>
 
 <?php include 'inc/footer.php'; ?>

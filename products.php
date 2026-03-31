@@ -77,7 +77,7 @@ $totalAllBooks = array_sum($genreCounts);
 ?>
 
 <!-- Page header -->
-<div class="products-page-header">
+<header class="products-page-header">
     <div class="container-fluid px-4 px-lg-5 products-header-inner">
         <div>
             <p class="section-eyebrow">Catalogue</p>
@@ -96,7 +96,7 @@ $totalAllBooks = array_sum($genreCounts);
             <?php if ($page > 1): ?>&mdash; Page <?= $page ?> of <?= $totalPages ?><?php endif; ?>
         </p>
     </div>
-</div>
+</header>
 
 <div class="container-fluid px-4 px-lg-5 products-layout">
 
@@ -223,7 +223,7 @@ $totalAllBooks = array_sum($genreCounts);
                 <div class="book-card-body">
                     <p class="book-card-genre"><?= htmlspecialchars($b['genre']) ?></p>
                     <a href="<?= $baseUrl ?>/book.php?id=<?= $b['productId'] ?>">
-                        <h3 class="book-card-title"><?= htmlspecialchars($b['title']) ?></h3>
+                        <h2 class="book-card-title"><?= htmlspecialchars($b['title']) ?></h2>
                     </a>
                     <p class="book-card-author">by <?= htmlspecialchars($b['author']) ?></p>
 
