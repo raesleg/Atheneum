@@ -93,15 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
             headerPill.textContent = data.label;
         }
 
-        var gifContainer = document.getElementById('transitGif');
-        if (gifContainer) {
-            if (data.status === 'in_transit') {
-                gifContainer.classList.add('visible');
-            } else {
-                gifContainer.classList.remove('visible');
-            }
-        }
-
         if (data.status === 'delivered') {
             setTimeout(function () {
                 location.reload();

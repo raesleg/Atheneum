@@ -413,25 +413,6 @@
     display: block;
 }
 
-.transit-gif-container {
-    text-align: center;
-    margin: 20px 0 0;
-    padding: 20px;
-    border-top: 1px solid var(--line);
-    display: none;
-}
-
-.transit-gif-container.visible {
-    display: block;
-    animation: fadeUp 0.5s ease both;
-}
-
-.transit-gif {
-    max-width: 200px;
-    max-height: 120px;
-    border-radius: 8px;
-}
-
 .transit-placeholder {
     display: flex;
     flex-direction: column;

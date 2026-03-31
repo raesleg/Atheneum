@@ -178,16 +178,6 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
                     </li>
                 <?php endforeach; ?>
             </ol>
-
-            <div class="transit-gif-container <?= $shipmentStatus === 'in_transit' ? 'visible' : '' ?>" 
-                 id="transitGif"
-                 role="img"
-                 aria-label="Animation showing package in transit">
-                <img src="<?= htmlspecialchars($TRANSIT_GIF_PATH) ?>" 
-                     alt="Package in transit animation" 
-                     class="transit-gif"
-                     onerror="this.parentElement.innerHTML='<div class=\'transit-placeholder\'><i class=\'bi bi-truck\' aria-hidden=\'true\'></i><span>Your package is on its way!</span></div>'">
-            </div>
         </section>
         <?php endif; ?>
 
@@ -248,7 +238,6 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
         timings: <?= $jsTimings ?>,
         statusOrder: <?= $jsStatusOrder ?>,
         statusLabels: <?= $jsStatusLabels ?>,
-        transitGifPath: '<?= htmlspecialchars($TRANSIT_GIF_PATH) ?>'
     };
 </script>
 
