@@ -22,11 +22,7 @@ if (!$token) {
     exit();
 }
 
-// if (isset($_SESSION['error'])) {
-//     $errorMsg = $_SESSION['error'];
-//     unset($_SESSION['error']);
-// }
-
+// check reset link is valid
 $stmt = $conn->prepare("SELECT username, reset_expiry FROM Users WHERE reset_token=?");
 $stmt->bind_param("s", $token);
 $stmt->execute();
@@ -51,27 +47,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errorMsg[] = "Invalid request.";
         $success = false;
     }
-    if (empty($_POST["password_new"]) || empty($_POST["password_confirm"])) {
+    if (empty($_POST["pwd"]) || empty($_POST["pwd_confirm"])) {
         $errorMsg[] = "Password is required.";
         $success = false;
-    } else {
-        if ($_POST["password_new"] !== $_POST["password_confirm"]) {
+    } 
+    else {
+        //password valiation
+        $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/';
+        if ($_POST["pwd"] !== $_POST["pwd_confirm"]) {
             $errorMsg[] = "Passwords do not match.";
             $success = false;
-        } elseif (strlen($_POST["password_new"]) < 8) {
-            $errorMsg[] = "Password must be at least 8 characters long.";
+        } 
+        elseif (!preg_match($pattern, $_POST["pwd"])) {
+            $errorMsg[] = "Password must be at least 8 characters long and contain uppercase, lowercase, numbers.";
             $success = false;
-        } else {
-            $pwd_hashed = password_hash($_POST["password_new"], PASSWORD_DEFAULT);
+        } 
+        else {
+            $pwd_hashed = password_hash($_POST["pwd"], PASSWORD_DEFAULT);
         }
     }
     if ($success) {
         updatePassword();
-    }
-
-    $_SESSION['alert'] = "Password updated. You can log in now.";
-    header("Location: login.php");
-    exit();
+        $_SESSION['alert'] = "Password updated. You can log in now.";
+        header("Location: login.php");
+        exit();
+    }  
 }
 
 function updatePassword() {
@@ -121,33 +121,32 @@ function updatePassword() {
     $stmt->close();
 }
 ?>
-        <main>
-            <div class="container">
-                <div class="card">
-                    <div class="card-header">
-                        <h1>Reset Password</h1>
-                    </div>
-                    <div class="error"><?php foreach ($errorMsg as $error): ?>
-                    <?php echo htmlspecialchars($error); ?>
-                <?php endforeach; ?></div>
-                    <form method="post">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                        <div class="mb-3">
-                        <label class="form-label" for="password_new">New Password:</label>
-                        <input required class="form-control" type="password" id="password_new" name="password_new"
-                        placeholder="Enter new password">
-                        </div>
-                        <div class="mb-3">
-                        <label class="form-label" for="password_confirm">Confirm New Password:</label>
-                        <input required class="form-control" type="password" id="password_confirm" name="password_confirm"
-                        placeholder="Confirm new password">
-                        </div>
-                        <div class="mb-3 submit">
-                        <button class="btn btn-primary" type="submit">Set Password</button>
-                        </div>
-                    </form>
-                    
-                </div>
+<main>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Reset Password</h1>
             </div>
-        </main>
+            <div class="error"><?php foreach ($errorMsg as $error): ?>
+            <?php echo htmlspecialchars($error); ?>
+            <?php endforeach; ?></div>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <div class="mb-3">
+                <label class="form-label" for="pwd">New Password:</label>
+                <input required minlength="8" maxlength="64" class="form-control" type="password" id="pwd" name="pwd"
+                placeholder="Enter new password">
+                </div>
+                <div class="mb-3">
+                <label class="form-label" for="pwd_confirm">Confirm New Password:</label>
+                <input required minlength="8" maxlength="64" class="form-control" type="password" id="pwd_confirm" name="pwd_confirm"
+                placeholder="Confirm new password">
+                </div>
+                <div class="mb-3 submit">
+                <button class="btn btn-primary" type="submit">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
 <?php include 'inc/footer.php'; ?>

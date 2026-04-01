@@ -1,9 +1,6 @@
 <?php
-$pageTitle = "Register";
-$extraCSS = [
-    "../assets/css/login.css"
-];
-
+$pageTitle = "Admin Register";
+$extraCSS = ["../assets/css/login.css"];
 $extraJS = [
     ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
     ["src" => "../assets/js/main.js", "defer" => true]
@@ -16,8 +13,8 @@ if ($isLoggedIn) {
     header("Location: ../index.php");
     exit();
 }
-if (!isset($_SESSION['reg_data'])) {
-    header("Location: register_step2.php");
+if (!isset($_SESSION['admin_reg_data'])) {
+    header("Location: register_step1.php");
     exit();
 }
 //CSRF
@@ -32,12 +29,35 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 
+// rate limiting
+if (!isset($_SESSION['register_attempts'])) {
+    $_SESSION['register_attempts'] = 0;
+    $_SESSION['first_attempt_time'] = time();
+}
 
-$username = $_SESSION['reg_data']['username'];
-$email = $_SESSION['reg_data']['email'];
-$fname = $_SESSION['reg_data']['fname'];
-$lname = $_SESSION['reg_data']['lname'];
-$pwd_hashed = $_SESSION['reg_data']['pwd_hashed'];
+$maxAttempts = 5;        // Max attempts
+$timeWindow = 300;       // 5 min in seconds
+
+// Reset counter after time window
+if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
+    $_SESSION['register_attempts'] = 0;
+    $_SESSION['first_attempt_time'] = time();
+}
+
+// Check if user is temporarily blocked
+if ($_SESSION['register_attempts'] >= $maxAttempts) {
+    //die("Too many registration attempts. Please try again later.");
+    $_SESSION['alert']= "Too many registration attempts. Please try again later.";
+    header("Location: ../index.php");
+    exit();
+}
+
+$username = $_SESSION['admin_reg_data']['username'];
+$email = $_SESSION['admin_reg_data']['email'];
+$fname = $_SESSION['admin_reg_data']['fname'];
+$lname = $_SESSION['admin_reg_data']['lname'];
+$pwd_hashed = $_SESSION['admin_reg_data']['pwd_hashed'];
+$profilePicPath = '../assets/images/default-avatar.jpg';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
@@ -47,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($success) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     } 
+    // Recaptcha
     $recaptcha_secret = "6LdCK5wsAAAAAC12fTpTk88DcWeDc5niNbSWNbLd";
     $recaptcha_response = $_POST['g-recaptcha-response'];
     $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$recaptcha_secret}&response={$recaptcha_response}");
@@ -56,65 +77,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errorMsg[] = "Please complete the reCAPTCHA.";
     } 
     else {
-        if ($success) {
+        // If picture uploaded
+        if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
+            $checkMime = getimagesize($_FILES['profile_pic']['tmp_name']);
+            $fileType = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
+            $allowTypes = ['jpg','jpeg','png','gif'];
+
+            // check file type
+            if ($checkMime === false || !in_array($fileType, $allowTypes)) {
+                $errorMsg[] = "Invalid file type. Only images are allowed.";
+                $success = false;
+            }
+
+            // check file size is <2mb
+            if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) {
+                $errorMsg[] = "File too large (max 2MB).";
+                $success = false;
+            }
+            $uploadDir = '../uploads/profile_pic/';
+            
+            if (!is_dir($uploadDir)){
+                mkdir($uploadDir, 0755, true);
+            } 
+
+            // Ensure file does not contain any invalid characters
+            $fileName = time() . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", basename($_FILES['profile_pic']['name']));
+            $targetFilePath = $uploadDir . $fileName;
+
+            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFilePath)) {
+                $profilePicPath = $targetFilePath;
+            } else {
+                $errorMsg[] = "Error uploading file.";
+                $success = false;
+                exit();
+            }
+        }
+
+        if ($success) { 
             saveMemberToDB();
         }
         if ($success) {
-            unset($_SESSION['reg_data']);
+            unset($_SESSION['admin_reg_data']);
             session_regenerate_id(true);
+            $_SESSION['register_attempts'] += 1;
             $_SESSION['alert'] = "Account created successfully. Please login";
-            header("Location: login.php");
+            header("Location: ../login.php");
             exit();
         }
     }
 }
 
 function sanitize_input($data) {
-    return htmlspecialchars(stripslashes(trim($data)));
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 
 function saveMemberToDB() {
-    global $conn, $username, $fname, $lname, $email, $pwd_hashed, $errorMsg, $success;
-
+    global $conn, $username, $fname, $lname, $email, $pwd_hashed, $errorMsg, $profilePicPath, $success;
     if (!$conn) {
         $errorMsg[] = "Database connection failed.";
         $success = false;
         return;
     }
-    $profilePicPath = '../assets/images/default-avatar.jpg';
-    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
-    $uploadDir = '../uploads/profile_pic/';
-    
-    if (!is_dir($uploadDir)){
-        mkdir($uploadDir, 0755, true);
-    } 
-    
-    // regex to replace non alphanumeric characters with _
-    $fileName = time() . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", basename($_FILES['profile_pic']['name']));
-    $targetFilePath = $uploadDir . $fileName;
-    $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
-    $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
-    $checkMime = getimagesize($_FILES['profile_pic']['tmp_name']);
-
-    if ($checkMime !== false && in_array(strtolower($fileType), $allowTypes)) {
-        if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) {
-            $errorMsg[] = "File too large (max 2MB).";
-            $success = false;
-        } 
-        else {
-            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFilePath)) {
-                $profilePicPath = $targetFilePath; 
-            }
-            else{
-                $errorMsg[] = "Error uploading file.";
-            }
-        }
-    }
-    else{
-        $errorMsg[] = "Invalid file type. Only images are allowed.";
-        $success = false;
-    }
-}
 
     // Check duplicate username or email
     $checkStmt = $conn->prepare("SELECT username FROM Users WHERE username = ? OR email = ?");
@@ -154,10 +180,8 @@ function saveMemberToDB() {
         $errorMsg[] = "Execute failed: " . $stmt->error;
         $success = false;
     }
-
     $stmt->close();
 }
-
 ?>
 
 <main>
@@ -166,38 +190,29 @@ function saveMemberToDB() {
             <div class="card-header">
                 <h1>Sign Up</h1>
             </div>
-            <div class="error"><?php foreach ($errorMsg as $error): ?>
-                <?php echo htmlspecialchars($error); ?>
+            <div class="error">
+                <?php foreach ($errorMsg as $error): ?>
+                    <?php echo htmlspecialchars($error); ?>
                 <?php endforeach; ?>
             </div>
             <form method="post"  enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div id="step2">
-                    <div class="card-header mb-3">
-                    <h3>Step 2: Upload Profile Picture</h3>
-                    </div>
-
                     <div class="mb-3 text-center">
-                    <img id="imgPreview" src="assets/images/default-avatar.jpg" 
-                    style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 2px solid #ddd;" 
-                    alt="Profile Preview">
+                        <img id="imgPreview" src="../assets/images/default-avatar.jpg" alt="Profile Preview">
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label" for="profile_pic">Select Image (JPG, PNG):</label>
-                        <input class="form-control" type="file" id="profile_pic" name="profile_pic" 
-                        accept="image/*">
+                        <label class="form-label" for="profile_pic">Upload profile picture (JPG, PNG):</label>
+                        <input class="form-control" type="file" id="profile_pic" name="profile_pic" accept="image/*">
                     </div>
                     <div class="g-recaptcha text-center" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div>
                     <div class="mb-3 d-flex justify-content-between">
-                        <button type="button" class="btn btn-secondary">Back</button>
-                        <!-- <div class="g-recaptcha" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div> -->
-                        <button class="btn btn-success" type="submit">Complete Registration</button>
+                        <a href="register_step1.php" class="btn btn-secondary">Back</a>
+                        <button class="btn btn-success" type="submit">Register</button>
                     </div>
                 </div>
             </form>
-            <div>Already have an account? <a href="login.php">Sign in here! </a>
-            </div>
+            <div>Already have an account? <a href="../login.php">Sign in here! </a></div>
         </div>
     </div>
 </main>

@@ -1,6 +1,8 @@
 
 <?php
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/PHPMailer/PHPMailer.php';
+require __DIR__ . '/PHPMailer/SMTP.php';
+require __DIR__ . '/PHPMailer/Exception.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 $pageTitle = "Reset Password";
@@ -75,14 +77,14 @@ function sendEmail($to, $link) {
     $mail = new PHPMailer(true);
     try{
         $mail->isSMTP();
-        // $mail->Host = 'smtp.gmail.com';
-        $mail->Host = 'sandbox.smtp.mailtrap.io';
+        $mail->Host = 'smtp.gmail.com';
+        // $mail->Host = 'sandbox.smtp.mailtrap.io';
         $mail->SMTPAuth = true;
-        $mail->Username = '2327ad7a4371df';
-        $mail->Password = '834865c96d87bf';
-        // Real emails
-        // $mail->Username = 'cgxh125@gmail.com';
-        // $mail->Password = 'fntm fpnz qekr zovh';
+        // $mail->Username = '2327ad7a4371df';
+        // $mail->Password = '834865c96d87bf';
+        // Use gmail to send real email
+        $mail->Username = 'cc.snapx@gmail.com';
+        $mail->Password = 'hzaf xnwh ssoi iowb';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         $mail->Timeout = 10;
@@ -103,35 +105,36 @@ function sendEmail($to, $link) {
 ?>
 
 <?php if ($alertMsg): ?>
-        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
         <?php echo htmlspecialchars($alertMsg); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
-    <?php include 'inc/nav.php'; ?>
+    </div>
+<?php endif; ?>
+<?php include 'inc/nav.php'; ?>
 
-        <main>
-            <div class="container">
-                <div class="card">
-                    <div class="card-header">
-                        <h1>Reset Password</h1>
-                    </div>
-                    <div class="error"><?php foreach ($errorMsg as $error): ?>
-                    <?php echo htmlspecialchars($error); ?>
-                <?php endforeach; ?></div>
-                    <form method="post">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                        <div class="mb-3">
-                        <label class="form-label" for="email">Email:</label>
-                        <input required maxlength="45" class="form-control" type="email" id="email" name="email"
-                        placeholder="Enter email">
-                        </div>
-                        <div class="mb-3 submit">
-                        <button class="btn btn-primary" type="submit">Submit</button>
-                        </div>
-                    </form>
-                    
-                </div>
+<main>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Reset Password</h1>
             </div>
-        </main>
+            <div class="error">
+                <?php foreach ($errorMsg as $error): ?>
+                    <?php echo htmlspecialchars($error); ?>
+                <?php endforeach; ?>
+            </div>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email:</label>
+                    <input required maxlength="45" class="form-control" type="email" id="email" name="email"
+                    placeholder="Enter email">
+                </div>
+                <div class="mb-3 submit">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>  
+        </div>
+    </div>
+</main>
 <?php include 'inc/footer.php'; ?>

@@ -1,11 +1,7 @@
 <?php
 $pageTitle = "Profile";
-$extraCSS = [
-    "assets/css/profile.css"
-];
-$extraJS = [
-    ["src" => "assets/js/main.js", "defer" => true]
-];
+$extraCSS = ["assets/css/profile.css"];
+$extraJS = [["src" => "assets/js/main.js", "defer" => true]];
 include 'inc/conn.php'; 
 include 'inc/header.php';
 
@@ -131,9 +127,9 @@ function sanitize_input($data) {
     <div class="error">
         <?php foreach ($errorMsg as $error): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?php echo htmlspecialchars($error); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+            <?php echo htmlspecialchars($error); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         <?php endforeach; ?>
     </div>
     <h1 class="profile-title">Your profile</h1>
@@ -158,12 +154,9 @@ function sanitize_input($data) {
                 </div>
             </div>
             <div class="profile-details">
-                
                 <div class="mb-3 text-center">
-                    <img id="profileImg" src="<?= htmlspecialchars($profilePic) ?>" 
-                        alt="Profile Picture">
+                    <img id="profileImg" src="<?= htmlspecialchars($profilePic) ?>" alt="Profile Picture">
                 </div>
-
                 <div class="mb-3">
                     <label for="profile_pic">Profile Picture</label>
                     <input type="file" name="profile_pic" id="profile_pic" class="form-control" accept="image/*">

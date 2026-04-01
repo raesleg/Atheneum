@@ -1,16 +1,11 @@
 <?php
 $pageTitle = "Register";
-$extraCSS = [
-    "../assets/css/login.css"
-];
+$extraCSS = ["assets/css/login.css"];
 
-$extraJS = [
-    ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
-    ["src" => "assets/js/main.js", "defer" => true]
-];
-include '../inc/conn.php'; 
-include '../inc/header.php';
-include "../inc/nav.php";
+$extraJS = [["src" => "assets/js/main.js", "defer" => true]];
+include 'inc/conn.php'; 
+include 'inc/header.php';
+include "inc/nav.php";
 
 if ($isLoggedIn) {
     header("Location: index.php");
@@ -27,6 +22,34 @@ if (isset($_SESSION['error'])) {
     $errorMsg = (array)$_SESSION['error'];
     unset($_SESSION['error']);
 }
+
+$regData = $_SESSION['reg_data'] ?? [];
+
+$username = htmlspecialchars($regData['username'] ?? '');
+$email    = htmlspecialchars($regData['email'] ?? '');
+$fname    = htmlspecialchars($regData['fname'] ?? '');
+$lname    = htmlspecialchars($regData['lname'] ?? '');
+
+// --- Rate Limiting ---
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['first_attempt_time'] = time();
+}
+
+$maxAttempts = 5;        // Max login attempts
+$timeWindow = 60;       // 5 minutes in seconds
+
+// Reset counter after time window
+if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['first_attempt_time'] = time();
+}
+
+// Check if user is temporarily blocked
+if ($_SESSION['login_attempts'] >= $maxAttempts) {
+    die("Too many login attempts. Please try again after". $timeWindow/60 . "minutes.");
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $errorMsg[] = "Invalid request. Please reload the page and try again.";
@@ -77,13 +100,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $success = false;
     } 
     else {
+        // password validation
+        $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/';
         if ($_POST["pwd"] !== $_POST["pwd_confirm"]) {
             $errorMsg[] = "Passwords do not match.";
             $success = false;
-        } elseif (strlen($_POST["pwd"]) < 8) {
-            $errorMsg[] = "Password must be at least 8 characters long.";
+        } 
+        elseif (!preg_match($pattern, $_POST["pwd"])) {
+            $errorMsg[] = "Password must be at least 8 characters long and contain uppercase, lowercase, numbers.";
             $success = false;
-        } else {
+        } 
+        else {
             $pwd_hashed = password_hash($_POST["pwd"], PASSWORD_DEFAULT);
         }
     }
@@ -101,7 +128,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 function sanitize_input($data) {
-    return htmlspecialchars(stripslashes(trim($data)));
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 ?>
 
@@ -120,22 +150,22 @@ function sanitize_input($data) {
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     <div class="mb-3">
                         <label class="form-label" for="username">Username:</label>
-                        <input required maxlength="45" class="form-control" type="text" id="username" name="username" placeholder="Enter username">
+                        <input required maxlength="45" class="form-control" type="text" id="username" name="username" placeholder="Enter username" value="<?= $username ?>">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="email">Email:</label>
                         <input required maxlength="45" class="form-control" type="email" id="email" name="email"
-                        placeholder="Enter email">
+                        placeholder="Enter email" value="<?= $email ?>">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="fname">First name:</label>
                         <input maxlength="45" class="form-control" type="text" id="fname" name="fname"
-                        placeholder="Enter first name">
+                        placeholder="Enter first name" value="<?= $fname ?>">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="lname">Last name:</label>
                         <input required maxlength="45" class="form-control" type="text" id="lname" name="lname"
-                        placeholder="Enter last name">
+                        placeholder="Enter last name" value="<?= $lname ?>">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="pwd">Password:</label>
@@ -152,10 +182,10 @@ function sanitize_input($data) {
                     </div>
                 </div>
             </form>
-            <div>Already have an account? <a href="../login.php">Sign in here! </a>
+            <div>Already have an account? <a href="login.php">Sign in here! </a>
             </div>
         </div>
     </div>
 </main>
 
-<?php include '../inc/footer.php'; ?>
+<?php include 'inc/footer.php'; ?>

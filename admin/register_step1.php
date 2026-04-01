@@ -1,19 +1,14 @@
 <?php
-$pageTitle = "Register";
-$extraCSS = [
-    "assets/css/login.css"
-];
+$pageTitle = "Admin Register";
+$extraCSS = ["../assets/css/login.css"];
 
-$extraJS = [
-    ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
-    ["src" => "assets/js/main.js", "defer" => true]
-];
-include 'inc/conn.php'; 
-include 'inc/header.php';
-include "inc/nav.php";
+$extraJS = [["src" => "../assets/js/main.js", "defer" => true]];
+include '../inc/conn.php'; 
+include '../inc/header.php';
+include "../inc/nav.php";
 
 if ($isLoggedIn) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 //CSRF
@@ -28,12 +23,12 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 
-$regData = $_SESSION['reg_data'] ?? [];
+$adminRegData = $_SESSION['admin_reg_data'] ?? [];
 
-$username = htmlspecialchars($regData['username'] ?? '');
-$email    = htmlspecialchars($regData['email'] ?? '');
-$fname    = htmlspecialchars($regData['fname'] ?? '');
-$lname    = htmlspecialchars($regData['lname'] ?? '');
+$username = htmlspecialchars($adminRegData['username'] ?? '');
+$email    = htmlspecialchars($adminRegData['email'] ?? '');
+$fname    = htmlspecialchars($adminRegData['fname'] ?? '');
+$lname    = htmlspecialchars($adminRegData['lname'] ?? '');
 
 // --- Rate Limiting ---
 if (!isset($_SESSION['login_attempts'])) {
@@ -105,19 +100,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $success = false;
     } 
     else {
+        // password validation
         $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/';
         if ($_POST["pwd"] !== $_POST["pwd_confirm"]) {
             $errorMsg[] = "Passwords do not match.";
             $success = false;
-        } elseif (!preg_match($pattern, $_POST["pwd"])) {
+        } 
+        elseif (!preg_match($pattern, $_POST["pwd"])) {
             $errorMsg[] = "Password must be at least 8 characters long and contain uppercase, lowercase, numbers.";
             $success = false;
-        } else {
+        } 
+        else {
             $pwd_hashed = password_hash($_POST["pwd"], PASSWORD_DEFAULT);
         }
     }
     if ($success) {
-        $_SESSION['reg_data'] = [
+        $_SESSION['admin_reg_data'] = [
             'username' => $username,
             'email' => $email,
             'fname' => $fname,
@@ -130,7 +128,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 function sanitize_input($data) {
-    return htmlspecialchars(stripslashes(trim($data)));
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 ?>
 
@@ -181,10 +182,10 @@ function sanitize_input($data) {
                     </div>
                 </div>
             </form>
-            <div>Already have an account? <a href="login.php">Sign in here! </a>
+            <div>Already have an account? <a href="../login.php">Sign in here! </a>
             </div>
         </div>
     </div>
 </main>
 
-<?php include 'inc/footer.php'; ?>
+<?php include '../inc/footer.php'; ?>

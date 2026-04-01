@@ -32,14 +32,14 @@ if (isset($_SESSION['alert'])) {
     unset($_SESSION['alert']);
 }
 
-// --- Rate Limiting ---
+// rate limiting
 if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['login_attempts'] = 0;
     $_SESSION['first_attempt_time'] = time();
 }
 
-$maxAttempts = 5;        // Max login attempts
-$timeWindow = 60;       // 5 minutes in seconds
+$maxAttempts = 5;        // Max attempts
+$timeWindow = 300;       // 5 min in seconds
 
 // Reset counter after time window
 if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
@@ -49,7 +49,7 @@ if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
 
 // Check if user is temporarily blocked
 if ($_SESSION['login_attempts'] >= $maxAttempts) {
-    die("Too many login attempts. Please try again after". $timeWindow/60 . "minutes.");
+    die("Too many login attempts. Please try again later.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -72,7 +72,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     } else {
         $username = "";
-        $success = true;
 
         if (empty($_POST["username"])) {
             $errorMsg[] = "Username is required.";
@@ -87,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($success) {
-            authenticateUser($conn); // pass $conn in
+            authenticateUser($conn);
         }
 
         if ($success) {
@@ -115,7 +114,7 @@ function sanitize_input($data) {
     return $data;
 }
 
-function authenticateUser($conn) { // receives $conn
+function authenticateUser($conn) {
     global $username, $fname, $lname, $email, $pwd_hashed, $errorMsg, $success;
 
     $stmt = $conn->prepare("SELECT * FROM Users WHERE username = ?");
@@ -130,12 +129,14 @@ function authenticateUser($conn) { // receives $conn
         $lname      = $row["lname"];
         $email      = $row["email"];
         $pwd_hashed = $row["password"];
-
+        
+        // check is password matches
         if (!password_verify($_POST["pwd"], $pwd_hashed)) {
             $errorMsg[] = "Incorrect username or password.";
             $success = false;
             $_SESSION['login_attempts'] += 1;
-        } else {
+        } 
+        else {
             session_regenerate_id(true);
             $_SESSION['userId'] = $row['userId']; // add this for cart queries
             $_SESSION['username'] = $username;
@@ -143,7 +144,8 @@ function authenticateUser($conn) { // receives $conn
             $_SESSION['loggedin'] = true;
             $success = true;
         }
-    } else {
+    } 
+    else {
         $errorMsg[] = "Incorrect username or password.";
         $success = false;
         $_SESSION['login_attempts'] += 1;
@@ -155,45 +157,40 @@ function authenticateUser($conn) { // receives $conn
 ?>
 <?php if ($alertMsg): ?>
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        <?php echo htmlspecialchars($alertMsg); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <?php echo htmlspecialchars($alertMsg); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
     <?php include 'inc/nav.php'; ?>
     
 <main>
-    
     <div class="container">
         <div class="card">
             <div class="card-header">
                 <h1>Sign in</h1>
             </div>
-            <div class="error"><?php foreach ($errorMsg as $error): ?>
+            <div class="error">
+                <?php foreach ($errorMsg as $error): ?>
                     <?php echo htmlspecialchars($error); ?>
-                <?php endforeach; ?></div>
+                <?php endforeach; ?>
+            </div>
             <form method="post">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div class="mb-3">
-                <label class="form-label" for="username">Username:</label>
-                <input required maxlength="45" class="form-control" type="text" id="username" name="username"
-                placeholder="Enter username">
+                    <label class="form-label" for="username">Username:</label>
+                    <input required maxlength="45" class="form-control" type="text" id="username" name="username" placeholder="Enter username">
                 </div>
                 <div class="mb-3">
-                <label class="form-label" for="pwd">Password:</label>
-                <input required minlength="8" maxlength="64" class="form-control" type="password" id="pwd" name="pwd"
-                placeholder="Enter password">
-                <a href="reset_password.php">Forgot your password?</a>
-                </div>
-                <div>
-                    
+                    <label class="form-label" for="pwd">Password:</label>
+                    <input required minlength="8" maxlength="64" class="form-control" type="password" id="pwd" name="pwd" placeholder="Enter password">
+                    <a href="reset_password.php">Forgot your password?</a>
                 </div>
                 <div class="g-recaptcha" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div>
                 <div class="mb-3 submit">
-                <button class="btn btn-primary" type="submit">Submit</button>
+                    <button class="btn btn-primary" type="submit">Submit</button>
                 </div>
             </form>
-            <div>Don't have an account? <a href="register.php">Sign up here! </a>
-            </div>
+            <div>Don't have an account? <a href="register.php">Sign up here! </a></div>
         </div>
     </div>
 </main>

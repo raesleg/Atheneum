@@ -334,3 +334,8 @@
     transition: background 0.2s, color 0.2s; white-space: nowrap;
 }
 .btn-cta-gold:hover { background: var(--gold-light); color: var(--navy); }
+
+.alert{
+  z-index: 1;
+  text-align: center;
+}

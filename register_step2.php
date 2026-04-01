@@ -1,9 +1,6 @@
 <?php
 $pageTitle = "Register";
-$extraCSS = [
-    "assets/css/login.css"
-];
-
+$extraCSS = ["assets/css/login.css"];
 $extraJS = [
     ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
     ["src" => "assets/js/main.js", "defer" => true]
@@ -32,14 +29,14 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 
-// --- Rate Limiting ---
+// rate limiting
 if (!isset($_SESSION['register_attempts'])) {
     $_SESSION['register_attempts'] = 0;
     $_SESSION['first_attempt_time'] = time();
 }
 
 $maxAttempts = 5;        // Max attempts
-$timeWindow = 2600;       // seconds
+$timeWindow = 300;       // 5 min in seconds
 
 // Reset counter after time window
 if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
@@ -49,7 +46,10 @@ if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
 
 // Check if user is temporarily blocked
 if ($_SESSION['register_attempts'] >= $maxAttempts) {
-    die("Too many registration attempts. Please try again after". $timeWindow/60 . "minutes.");
+    //die("Too many registration attempts. Please try again later.");
+    $_SESSION['alert']= "Too many registration attempts. Please try again later.";
+    header("Location: index.php");
+    exit();
 }
 
 $username = $_SESSION['reg_data']['username'];
@@ -77,6 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errorMsg[] = "Please complete the reCAPTCHA.";
     } 
     else {
+        // If picture uploaded
         if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
             $checkMime = getimagesize($_FILES['profile_pic']['tmp_name']);
             $fileType = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
@@ -110,8 +111,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $success = false;
                 exit();
             }
-            
         }
+
         if ($success) { 
             saveMemberToDB();
         }
@@ -127,7 +128,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 function sanitize_input($data) {
-    return htmlspecialchars(stripslashes(trim($data)));
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 
 function saveMemberToDB() {
@@ -176,10 +180,8 @@ function saveMemberToDB() {
         $errorMsg[] = "Execute failed: " . $stmt->error;
         $success = false;
     }
-
     $stmt->close();
 }
-
 ?>
 
 <main>
@@ -188,32 +190,29 @@ function saveMemberToDB() {
             <div class="card-header">
                 <h1>Sign Up</h1>
             </div>
-            <div class="error"><?php foreach ($errorMsg as $error): ?>
-                <?php echo htmlspecialchars($error); ?>
+            <div class="error">
+                <?php foreach ($errorMsg as $error): ?>
+                    <?php echo htmlspecialchars($error); ?>
                 <?php endforeach; ?>
             </div>
             <form method="post"  enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div id="step2">
                     <div class="mb-3 text-center">
-                    <img id="imgPreview" src="assets/images/default-avatar.jpg" alt="Profile Preview">
+                        <img id="imgPreview" src="assets/images/default-avatar.jpg" alt="Profile Preview">
                     </div>
-
                     <div class="mb-3">
-                        <label class="form-label" for="profile_pic">Select Image (JPG, PNG):</label>
-                        <input class="form-control" type="file" id="profile_pic" name="profile_pic" 
-                        accept="image/*">
+                        <label class="form-label" for="profile_pic">Upload profile picture (JPG, PNG):</label>
+                        <input class="form-control" type="file" id="profile_pic" name="profile_pic" accept="image/*">
                     </div>
                     <div class="g-recaptcha text-center" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div>
                     <div class="mb-3 d-flex justify-content-between">
                         <a href="register.php" class="btn btn-secondary">Back</a>
-                        <!-- <div class="g-recaptcha" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div> -->
                         <button class="btn btn-success" type="submit">Register</button>
                     </div>
                 </div>
             </form>
-            <div>Already have an account? <a href="login.php">Sign in here! </a>
-            </div>
+            <div>Already have an account? <a href="login.php">Sign in here! </a></div>
         </div>
     </div>
 </main>

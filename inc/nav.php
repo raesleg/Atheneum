@@ -100,7 +100,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     </div>
                 <?php else: ?>
                     <a href="<?= $baseUrl ?>/login.php" class="btn btn-outline-dark btn-sm" style="font-size:0.78rem;letter-spacing:1px;border-radius:4px">Login</a>
-                    <a href="<?= $baseUrl ?>/register.php" class="btn btn-dark btn-sm" style="font-size:0.78rem;letter-spacing:1px;border-radius:4px">Sign Up</a>
+                    <a href="<?= $baseUrl ?>/register_step1.php" class="btn btn-dark btn-sm" style="font-size:0.78rem;letter-spacing:1px;border-radius:4px">Sign Up</a>
                 <?php endif; ?>
             </div>
         </div>

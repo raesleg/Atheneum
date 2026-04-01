@@ -1,9 +1,17 @@
 <?php
 $pageTitle = "Home";
 $extraCSS  = ["assets/css/index.css"];
+$extraJS = [["src" => "assets/js/main.js", "defer" => true]];
 include 'inc/conn.php';
 include 'inc/header.php';
 include 'inc/nav.php';
+
+// retrieve alert msg
+$alertMsg = "";
+if (isset($_SESSION['alert'])) {
+    $alertMsg = $_SESSION['alert'];
+    unset($_SESSION['alert']);
+}
 
 // book slideshow (random order)
 $stmtSlide = $conn->query("SELECT productId, title, author, genre, price, cover_image FROM Products ORDER BY RAND() LIMIT 30");
@@ -23,6 +31,13 @@ foreach ($genres as $g) {
 // Total book count for hero
 $totalBooks = $conn->query("SELECT COUNT(*) AS c FROM Products")->fetch_assoc()['c'];
 ?>
+<!-- alert display -->
+<?php if ($alertMsg): ?>
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <?php echo htmlspecialchars($alertMsg); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
 <!-- HERO — slideshow + CTA -->
 <section class="hero-section" aria-label="Featured books slideshow">
