@@ -128,22 +128,24 @@ $totalAllBooks = array_sum($genreCounts);
         <!-- Genre filter -->
         <div class="sidebar-block">
             <p class="sidebar-block-title">Genre</p>
-            <ul class="sidebar-genre-list" role="list">
+            <ul class="sidebar-genre-list">
                 <li>
                     <a href="<?= $baseUrl ?>/products.php?search=<?= urlencode($search) ?>&sort=<?= $sort ?>"
                        class="sidebar-genre-link <?= $genre === '' ? 'active' : '' ?>"
+                       aria-label="All Books, <?= $totalAllBooks ?> books"
                        <?= $genre === '' ? 'aria-current="page"' : '' ?>>
                         All Books
-                        <span class="sidebar-count" aria-label="<?= $totalAllBooks ?> books"><?= $totalAllBooks ?></span>
+                        <span class="sidebar-count" aria-hidden="true"><?= $totalAllBooks ?></span>
                     </a>
                 </li>
                 <?php foreach ($genreList as $g): ?>
                 <li>
                     <a href="<?= $baseUrl ?>/products.php?genre=<?= urlencode($g) ?>&search=<?= urlencode($search) ?>&sort=<?= $sort ?>"
                        class="sidebar-genre-link <?= $genre === $g ? 'active' : '' ?>"
+                       aria-label="<?= htmlspecialchars($g) ?>, <?= $genreCounts[$g] ?> books"
                        <?= $genre === $g ? 'aria-current="page"' : '' ?>>
                         <?= htmlspecialchars($g) ?>
-                        <span class="sidebar-count" aria-label="<?= $genreCounts[$g] ?> books"><?= $genreCounts[$g] ?></span>
+                        <span class="sidebar-count" aria-hidden="true"><?= $genreCounts[$g] ?></span>
                     </a>
                 </li>
                 <?php endforeach; ?>
@@ -210,7 +212,7 @@ $totalAllBooks = array_sum($genreCounts);
                    aria-label="<?= htmlspecialchars($b['title']) ?> by <?= htmlspecialchars($b['author']) ?>">
                     <div class="book-card-cover" aria-hidden="true">
                         <?php if ($b['cover_image']): ?>
-                        <img src="<?= htmlspecialchars($b['cover_image']) ?>"
+                        <img src="<?= htmlspecialchars(asset_url($b['cover_image'])) ?>"
                              alt=""
                              loading="lazy"
                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -234,7 +236,7 @@ $totalAllBooks = array_sum($genreCounts);
                     <?php endif; ?>
 
                     <div class="book-card-footer">
-                        <span class="book-card-price" aria-label="Price: $<?= number_format($b['price'], 2) ?>">
+                        <span class="book-card-price">
                             $<?= number_format($b['price'], 2) ?>
                         </span>
                         <?php if ($b['quantity'] <= 0): ?>

@@ -112,7 +112,7 @@ if (isset($_SESSION['admin_flash'])) {
             <div class="product-card">
                 <div class="cover">
                     <?php if ($p['cover_image']): ?>
-                        <img src="../<?= htmlspecialchars($p['cover_image']) ?>" alt="cover">
+                        <img src="../<?= htmlspecialchars(asset_url($p['cover_image'])) ?>" alt="cover">
                     <?php else: ?>
                         <i class="bi bi-book"></i>
                     <?php endif; ?>

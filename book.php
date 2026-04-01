@@ -122,7 +122,7 @@ if ($isLoggedIn) {
         <div class="book-detail-grid">
             <div class="book-cover-col">
                 <?php if (!empty($book['cover_image'])): ?>
-                    <img src="<?= htmlspecialchars($book['cover_image']) ?>" 
+                    <img src="<?= htmlspecialchars(asset_url($book['cover_image'])) ?>" 
                          alt="Cover of <?= htmlspecialchars($book['title']) ?> by <?= htmlspecialchars($book['author']) ?>" 
                          class="book-cover-large"
                          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -157,7 +157,7 @@ if ($isLoggedIn) {
                     <span class="rating-count" aria-hidden="true">(<?= $totalReviews ?> review<?= $totalReviews !== 1 ? 's' : '' ?>)</span>
                 </div>
 
-                <p class="book-price-lg" aria-label="Price: $<?= number_format($book['price'], 2) ?>">$<?= number_format($book['price'], 2) ?></p>
+                <p class="book-price-lg">$<?= number_format($book['price'], 2) ?></p>
 
                 <?php if (!empty($book['description'])): ?>
                     <p class="book-desc"><?= nl2br(htmlspecialchars($book['description'])) ?></p>
@@ -318,7 +318,7 @@ if ($isLoggedIn) {
                    aria-label="<?= htmlspecialchars($rb['title']) ?> by <?= htmlspecialchars($rb['author']) ?>">
                     <div class="related-cover" aria-hidden="true">
                         <?php if (!empty($rb['cover_image'])): ?>
-                        <img src="<?= htmlspecialchars($rb['cover_image']) ?>"
+                        <img src="<?= htmlspecialchars(asset_url($rb['cover_image'])) ?>"
                              alt=""
                              loading="lazy"
                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">

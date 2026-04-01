@@ -167,7 +167,7 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
                 <?php foreach ($items as $item): ?>
                     <div class="order-item-row" role="listitem" aria-label="<?= htmlspecialchars($item['title']) ?>, quantity <?= $item['quantity'] ?>">
                         <?php if (!empty($item['cover_image'])): ?>
-                            <img src="<?= htmlspecialchars($item['cover_image']) ?>" 
+                            <img src="<?= htmlspecialchars(asset_url($item['cover_image'])) ?>" 
                                  alt="Cover of <?= htmlspecialchars($item['title']) ?>" class="order-item-cover">
                         <?php else: ?>
                             <div class="order-item-cover-placeholder" role="img" aria-label="No cover image">

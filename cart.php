@@ -70,7 +70,7 @@ $total    = $subtotal + $shipping;
             <div class="cart-item" id="item-<?= $item['id'] ?>">
                 <!-- Cover -->
                 <?php if (!empty($item['cover'])): ?>
-                    <img src="<?= htmlspecialchars($item['cover']) ?>" alt="<?= htmlspecialchars($item['title']) ?>" class="book-cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <img src="<?= htmlspecialchars(asset_url($item['cover'])) ?>" alt="<?= htmlspecialchars($item['title']) ?>" class="book-cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                     <div class="book-cover-placeholder" style="display:none"><i class="bi bi-book"></i></div>
                 <?php else: ?>
                     <div class="book-cover-placeholder"><i class="bi bi-book"></i></div>
@@ -82,7 +82,7 @@ $total    = $subtotal + $shipping;
                     <p class="item-author"><?= htmlspecialchars($item['author']) ?></p>
                     <p class="item-price-unit">$<?= number_format($item['price'], 2) ?> each</p>
                     <div class="qty-controls">
-                        <button class="qty-btn" aria-label="Decrease quantity of <?= htmlspecialchars($item['title']) ?>"onclick="changeQty(<?= $item['id'] ?>, -1)">−</button>
+                        <button class="qty-btn" aria-label="Decrease quantity of <?= htmlspecialchars($item['title']) ?>" onclick="changeQty(<?= $item['id'] ?>, -1)">−</button>
                         <span class="qty-display" id="qty-<?= $item['id'] ?>"><?= $item['qty'] ?></span>
                         <button class="qty-btn" aria-label="Increase quantity of <?= htmlspecialchars($item['title']) ?>" onclick="changeQty(<?= $item['id'] ?>, 1)">+</button>
                     </div>

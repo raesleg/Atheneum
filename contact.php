@@ -134,7 +134,7 @@ if (empty($_SESSION['csrf_token'])) {
                            value="<?= htmlspecialchars($values['name'] ?? '') ?>"
                            placeholder="Jane Doe"
                            autocomplete="name"
-                           required aria-required="true">
+                           required>
                 </div>
                 <div class="form-group">
                     <label for="contactEmail" class="form-label-custom">
@@ -146,7 +146,7 @@ if (empty($_SESSION['csrf_token'])) {
                            value="<?= htmlspecialchars($values['email'] ?? '') ?>"
                            placeholder="jane@example.com"
                            autocomplete="email"
-                           required aria-required="true">
+                           required>
                 </div>
             </div>
 
@@ -167,8 +167,7 @@ if (empty($_SESSION['csrf_token'])) {
                           class="form-input-custom"
                           rows="7"
                           placeholder="Tell us how we can help…"
-                          required
-                          aria-required="true"><?= htmlspecialchars($values['message'] ?? '') ?></textarea>
+                          required><?= htmlspecialchars($values['message'] ?? '') ?></textarea>
             </div>
 
             <div class="form-footer">
