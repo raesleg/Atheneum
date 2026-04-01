@@ -18,7 +18,7 @@ if (!$row || $row['role'] !== 'admin') {
 }
 
 $errorMsg       = '';
-$allowed_genres = ['Fiction', 'Non-Fiction', 'Mystery', 'Thriller', 'Romance', 'Sci-Fi', 'Fantasy'];
+$allowed_genres = ['Fiction & Literature', 'Non-Fiction & Self Help', 'Science & Technology'];
 
 // CSRF
 if (empty($_SESSION['csrf_token'])) {
