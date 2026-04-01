@@ -93,6 +93,26 @@
     color: var(--navy-mid);
 }
 
+.cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    pointer-events: none;
+}
+.cart-badge.badge-lg  { font-size: 0.5rem; }   /* 10–99  */
+.cart-badge.badge-xl  { font-size: 0.4rem; }   /* 100+   */
+
 .badge-circle {
     position: absolute;
     top: -8px;

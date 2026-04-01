@@ -88,6 +88,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 400);
     }
 
+    function updateCartBadge(delta) {
+        var badge = document.getElementById('cart-badge');
+        if (!badge) return;
+        var current = parseInt(badge.textContent) || 0;
+        var next = current + delta;
+        badge.textContent = next;
+        badge.style.display = next > 0 ? '' : 'none';
+        badge.classList.remove('badge-lg', 'badge-xl');
+        if (next >= 100) badge.classList.add('badge-xl');
+        else if (next >= 10) badge.classList.add('badge-lg');
+    }
+
     function escapeHtml(str) {
         return str
             .replace(/&/g, '&amp;')
