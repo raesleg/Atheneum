@@ -15,12 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = validate_csrf_json();
+$newToken = $_SESSION['csrf_token'];
+
 $action = $data['action'] ?? '';
 $productId = (int)($data['productId'] ?? 0);
 
 if ($productId <= 0) {
-    echo json_encode(['success' => false, 'error' => 'Invalid product ID']);
+    echo json_encode(['success' => false, 'error' => 'Invalid product ID', 'csrf_token' => $newToken]);
     exit;
 }
 
@@ -36,7 +38,7 @@ if ($action === 'add') {
     $stmt->execute();
     $stmt->close();
 
-    echo json_encode(['success' => true]);
+    echo json_encode(['success' => true, 'csrf_token' => $newToken]);
     exit;
 }
 
@@ -48,7 +50,7 @@ if ($action === 'update') {
     $stmt->execute();
     $stmt->close();
 
-    echo json_encode(['success' => true]);
+    echo json_encode(['success' => true, 'csrf_token' => $newToken]);
     exit;
 }
 
@@ -58,10 +60,10 @@ if ($action === 'remove') {
     $stmt->execute();
     $stmt->close();
 
-    echo json_encode(['success' => true]);
+    echo json_encode(['success' => true, 'csrf_token' => $newToken]);
     exit;
 }
 
-echo json_encode(['success' => false, 'error' => 'Invalid action']);
+echo json_encode(['success' => false, 'error' => 'Invalid action', 'csrf_token' => $newToken]);
 exit;
 ?>

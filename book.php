@@ -338,4 +338,6 @@ if ($isLoggedIn) {
     <?php endif; ?>
 </main>
 
+<script>let CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token']) ?>;</script>
+
 <?php include 'inc/footer.php'; ?>
