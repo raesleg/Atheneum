@@ -139,7 +139,8 @@ function sanitize_input($data) {
     <div class="container">
         <div class="card">
             <div class="card-header">
-                <h1>Sign Up</h1>
+                <h1>Create Account</h1>
+                <p style="color:var(--muted);font-size:0.88rem;margin:6px 0 0;">Join Atheneum and start your reading journey</p>
             </div>
             <div class="error"><?php foreach ($errorMsg as $error): ?>
                 <?php echo htmlspecialchars($error); ?>

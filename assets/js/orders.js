@@ -17,6 +17,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (data) {
                 if (!data.success) return;
 
+                // If order has been refunded, stop polling and refresh the page to show refund details
+                if (data.isRefunded) {
+                    clearInterval(pollTimer);
+                    location.reload();
+                    return;
+                }
+
                 if (data.status !== currentStatus) {
                     currentStatus = data.status;
                     updateTrackerUI(data);
@@ -84,15 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             headerPill.classList.add(data.status.replace(/_/g, '-'));
             headerPill.textContent = data.label;
-        }
-
-        var gifContainer = document.getElementById('transitGif');
-        if (gifContainer) {
-            if (data.status === 'in_transit') {
-                gifContainer.classList.add('visible');
-            } else {
-                gifContainer.classList.remove('visible');
-            }
         }
 
         if (data.status === 'delivered') {

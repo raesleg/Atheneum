@@ -1,3 +1,4 @@
 /config/db-config.ini
 /config/stripe.local.php
 /vendor/
+.vscode/sftp.json

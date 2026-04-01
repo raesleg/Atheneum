@@ -39,6 +39,7 @@ $totalBooks = $conn->query("SELECT COUNT(*) AS c FROM Products")->fetch_assoc()[
         </div>
     <?php endif; ?>
 
+<main>
 <!-- HERO — slideshow + CTA -->
 <section class="hero-section" aria-label="Featured books slideshow">
     <div class="hero-inner container-fluid px-4 px-lg-5">
@@ -63,7 +64,7 @@ $totalBooks = $conn->query("SELECT COUNT(*) AS c FROM Products")->fetch_assoc()[
                 </a>
             </div>
             <!-- Stats -->
-            <div class="hero-stats" aria-label="Store highlights">
+            <div class="hero-stats" role="group" aria-label="Store highlights">
                 <div class="hero-stat">
                     <span class="hero-stat-num"><?= $totalBooks ?>+</span>
                     <span class="hero-stat-label">Titles</span>
@@ -83,7 +84,7 @@ $totalBooks = $conn->query("SELECT COUNT(*) AS c FROM Products")->fetch_assoc()[
 
         <!-- Right: carousel -->
         <div class="hero-carousel-wrap">
-            <div class="hero-carousel" id="heroCarousel" aria-label="Book slideshow" aria-live="polite">
+            <div class="hero-carousel" id="heroCarousel" role="region" aria-label="Book slideshow" aria-live="polite">
                 <?php foreach ($slideBooks as $i => $b): ?>
                 <div class="hero-slide <?= $i === 0 ? 'active' : '' ?>"
                      role="group"
@@ -94,7 +95,7 @@ $totalBooks = $conn->query("SELECT COUNT(*) AS c FROM Products")->fetch_assoc()[
                        tabindex="<?= $i === 0 ? '0' : '-1' ?>">
                         <div class="hero-book-cover">
                             <?php if ($b['cover_image']): ?>
-                            <img src="<?= htmlspecialchars($b['cover_image']) ?>"
+                            <img src="<?= htmlspecialchars(asset_url($b['cover_image'])) ?>"
                                  alt="Cover of <?= htmlspecialchars($b['title']) ?>"
                                  loading="<?= $i < 2 ? 'eager' : 'lazy' ?>"
                                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -123,12 +124,10 @@ $totalBooks = $conn->query("SELECT COUNT(*) AS c FROM Products")->fetch_assoc()[
                 <button class="carousel-btn" id="heroPrev" aria-label="Previous book">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>
                 </button>
-                <div class="carousel-dots" role="tablist" aria-label="Slideshow navigation">
+                <div class="carousel-dots" role="group" aria-label="Slideshow navigation">
                     <?php foreach ($slideBooks as $i => $b): ?>
                     <button class="carousel-dot <?= $i === 0 ? 'active' : '' ?>"
                             data-index="<?= $i ?>"
-                            role="tab"
-                            aria-selected="<?= $i === 0 ? 'true' : 'false' ?>"
                             aria-label="Go to slide <?= $i + 1 ?>">
                     </button>
                     <?php endforeach; ?>
@@ -196,14 +195,14 @@ foreach ($featuredByGenre as $gName => $books):
         </div>
         <hr class="section-rule" aria-hidden="true">
 
-        <div class="books-grid" role="list">
+        <div class="books-grid">
             <?php foreach ($books as $b): ?>
-            <article class="book-card" role="listitem">
+            <article class="book-card">
                 <a href="<?= $baseUrl ?>/book.php?id=<?= $b['productId'] ?>" class="book-card-cover-link"
                    aria-label="<?= htmlspecialchars($b['title']) ?> by <?= htmlspecialchars($b['author']) ?>">
                     <div class="book-card-cover" aria-hidden="true">
                         <?php if ($b['cover_image']): ?>
-                        <img src="<?= htmlspecialchars($b['cover_image']) ?>"
+                        <img src="<?= htmlspecialchars(asset_url($b['cover_image'])) ?>"
                              alt=""
                              loading="lazy"
                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -219,7 +218,7 @@ foreach ($featuredByGenre as $gName => $books):
                         <h3 class="book-card-title"><?= htmlspecialchars($b['title']) ?></h3>
                     </a>
                     <p class="book-card-author">by <?= htmlspecialchars($b['author']) ?></p>
-                    <p class="book-card-price" aria-label="Price: $<?= number_format($b['price'], 2) ?>">
+                    <p class="book-card-price">
                         $<?= number_format($b['price'], 2) ?>
                     </p>
                     <a href="<?= $baseUrl ?>/book.php?id=<?= $b['productId'] ?>"
@@ -274,6 +273,7 @@ foreach ($featuredByGenre as $gName => $books):
         </a>
     </div>
 </section>
+</main>
 
 <!-- Slideshow JS -->
 <script>

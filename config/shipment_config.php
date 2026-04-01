@@ -10,8 +10,6 @@ $SHIPMENT_TIMINGS = [
 
 $REVIEW_WINDOW_DAYS = 14;
 
-$TRANSIT_GIF_PATH = 'assets/images/delivery.gif';
-
 $STATUS_ORDER = ['order_placed', 'order_shipped', 'in_transit', 'out_for_delivery', 'delivered'];
 
 $STATUS_LABELS = [

@@ -9,6 +9,28 @@ $success = false;
 $errors  = [];
 $values  = [];
 
+// Refund Logic to fetch logged-in user's eligible orders (paid or no duplicate refund request)
+$eligibleOrders = [];
+if ($isLoggedIn && $userId) {
+    try {
+        $stmt = $conn->prepare("
+            SELECT o.orderId, o.totalPrice, o.created_at
+            FROM Orders o
+            LEFT JOIN Refund r ON o.orderId = r.orderId
+            WHERE o.userId        = ?
+              AND o.paymentStatus = 'paid'
+              AND r.refundId      IS NULL
+            ORDER BY o.created_at DESC
+        ");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $eligibleOrders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+    } catch (Exception $e) {
+        // Silently fail or log
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF check — matches existing pattern in login.php
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
@@ -20,22 +42,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = trim(htmlspecialchars($_POST['message'] ?? ''));
         $values  = compact('name', 'email', 'subject', 'message');
 
-        if (empty($name))                                $errors[] = 'Your name is required.';
-        if (empty($email))                               $errors[] = 'Your email address is required.';
-        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
-        if (empty($message))                             $errors[] = 'Please enter a message.';
-        elseif (strlen($message) < 10)                   $errors[] = 'Your message must be at least 10 characters.';
+        // Refund Logic for shared message length check
+        if (empty($message)) {
+            $errors[] = 'Please enter a message or reason.';
+        } elseif (strlen($message) < 10) {
+            $errors[] = 'Your message must be at least 10 characters.';
+        }
 
-        if (empty($errors)) {
-            $stmt = $conn->prepare("
-                INSERT INTO ContactMessages (name, email, subject, message)
-                VALUES (?, ?, ?, ?)
-            ");
-            $stmt->bind_param("ssss", $name, $email, $subject, $message);
-            $stmt->execute();
-            $stmt->close();
-            $success = true;
-            $values  = [];
+        // Refund logic to distinguish between refund requests and general messages
+        if ($subject === 'refund') {
+            $orderId = (int)($_POST['orderId'] ?? 0);
+            
+            if (!$isLoggedIn) {
+                $errors[] = 'You must be logged in to request a refund.';
+            } elseif ($orderId <= 0) {
+                $errors[] = 'Please select a valid order.';
+            } else {
+                try {
+                    $stmt = $conn->prepare("INSERT INTO Refund (orderId, userId, reason, status) VALUES (?, ?, ?, 'pending')");
+                    $stmt->bind_param("iis", $orderId, $userId, $message);
+                    if ($stmt->execute()) {
+                        $success = true;
+                        $values  = [];
+                    } else {
+                        $errors[] = 'Could not submit refund request.';
+                    }
+                    $stmt->close();
+                } catch (mysqli_sql_exception $e) {
+                    if ($e->getCode() === 1062) {
+                        $errors[] = 'You have already submitted a refund request for this order.';
+                    } else {
+                        $errors[] = 'A database error occurred while processing your refund.';
+                    }
+                }
+            }
+        } else {
+            // Original Contact Logic
+            if (empty($name))                                $errors[] = 'Your name is required.';
+            if (empty($email))                               $errors[] = 'Your email address is required.';
+            elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
+
+            if (empty($errors)) {
+                $stmt = $conn->prepare("
+                    INSERT INTO ContactMessages (name, email, subject, message)
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->bind_param("ssss", $name, $email, $subject, $message);
+                $stmt->execute();
+                $stmt->close();
+                $success = true;
+                $values  = [];
+            }
         }
     }
 }
@@ -54,7 +111,7 @@ if (empty($_SESSION['csrf_token'])) {
         <p class="section-eyebrow">Get in Touch</p>
         <h1 class="section-heading">Contact Us</h1>
         <p class="contact-header-sub">
-            Have a question about an order, a book recommendation, or just want to say hello?
+            Have a question about an order, a book recommendation, or a refund?
             We read every message and aim to reply within one business day.
         </p>
     </div>
@@ -102,8 +159,8 @@ if (empty($_SESSION['csrf_token'])) {
         <div class="contact-success" role="alert" aria-live="polite">
             <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
             <div>
-                <strong>Message sent!</strong>
-                <p>Thank you for reaching out. We will get back to you within one business day.</p>
+                <strong>Success!</strong>
+                <p>Your request has been sent. We will get back to you within one business day.</p>
             </div>
         </div>
         <?php endif; ?>
@@ -119,7 +176,7 @@ if (empty($_SESSION['csrf_token'])) {
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?= $baseUrl ?>/contact.php" class="contact-form" novalidate
+        <form method="POST" action="contact.php" class="contact-form" novalidate
               aria-label="Contact form">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
 
@@ -134,7 +191,7 @@ if (empty($_SESSION['csrf_token'])) {
                            value="<?= htmlspecialchars($values['name'] ?? '') ?>"
                            placeholder="Jane Doe"
                            autocomplete="name"
-                           required aria-required="true">
+                           required>
                 </div>
                 <div class="form-group">
                     <label for="contactEmail" class="form-label-custom">
@@ -146,20 +203,42 @@ if (empty($_SESSION['csrf_token'])) {
                            value="<?= htmlspecialchars($values['email'] ?? '') ?>"
                            placeholder="jane@example.com"
                            autocomplete="email"
-                           required aria-required="true">
+                           required>
                 </div>
             </div>
 
+            <!-- Refund logic to convert subject to a select dropdown -->
             <div class="form-group">
-                <label for="contactSubject" class="form-label-custom">Subject</label>
-                <input type="text" id="contactSubject" name="subject"
-                       class="form-input-custom"
-                       value="<?= htmlspecialchars($values['subject'] ?? '') ?>"
-                       placeholder="Order enquiry, book recommendation…">
+                <label for="contactSubject" class="form-label-custom">How can we help? <span class="req">*</span></label>
+                <select id="contactSubject" name="subject" class="form-input-custom" required>
+                    <option value="">-- Choose a subject --</option>
+                    <option value="enquiry" <?= ($values['subject'] ?? '') === 'enquiry' ? 'selected' : '' ?>>General Enquiry</option>
+                    <option value="refund" <?= ($values['subject'] ?? '') === 'refund' ? 'selected' : '' ?>>Request a Refund</option>
+                    <option value="feedback" <?= ($values['subject'] ?? '') === 'feedback' ? 'selected' : '' ?>>Feedback</option>
+                </select>
+            </div>
+
+            <!-- Refund logic. Added refund section -->
+            <div id="refund-section" class="refund-box form-group" style="display: none;">
+                <label for="orderId" class="form-label-custom">Select Order <span class="req">*</span></label>
+                <?php if (!$isLoggedIn): ?>
+                    <p class="small text-danger">Please log in to view your orders.</p>
+                <?php elseif (empty($eligibleOrders)): ?>
+                    <p class="small text-muted">No orders eligible for refund found.</p>
+                <?php else: ?>
+                    <select name="orderId" id="orderId" class="form-input-custom">
+                        <option value="">-- Choose an Order --</option>
+                        <?php foreach ($eligibleOrders as $order): ?>
+                            <option value="<?= $order['orderId'] ?>">
+                                Order #<?= $order['orderId'] ?> ($<?= number_format($order['totalPrice'], 2) ?>) - <?= date('d M Y', strtotime($order['created_at'])) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                <?php endif; ?>
             </div>
 
             <div class="form-group">
-                <label for="contactMessage" class="form-label-custom">
+                <label for="contactMessage" id="msgLabel" class="form-label-custom">
                     Message <span class="req" aria-hidden="true">*</span>
                     <span class="visually-hidden">(required)</span>
                 </label>
@@ -167,8 +246,7 @@ if (empty($_SESSION['csrf_token'])) {
                           class="form-input-custom"
                           rows="7"
                           placeholder="Tell us how we can help…"
-                          required
-                          aria-required="true"><?= htmlspecialchars($values['message'] ?? '') ?></textarea>
+                          required><?= htmlspecialchars($values['message'] ?? '') ?></textarea>
             </div>
 
             <div class="form-footer">
@@ -176,7 +254,7 @@ if (empty($_SESSION['csrf_token'])) {
                     <i class="bi bi-lock" aria-hidden="true"></i>
                     Your information is never shared with third parties.
                 </p>
-                <button type="submit" class="btn-hero-primary">
+                <button type="submit" id="submitBtn" class="btn-hero-primary">
                     <i class="bi bi-send" aria-hidden="true"></i> Send Message
                 </button>
             </div>
@@ -186,4 +264,5 @@ if (empty($_SESSION['csrf_token'])) {
 
 </main>
 
+<script src="assets/js/contact.js"></script>
 <?php include 'inc/footer.php'; ?>
