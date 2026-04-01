@@ -615,3 +615,8 @@ body.panel-open {
         grid-template-columns: 1fr;
     }
 }
+
+.alert{
+  z-index: 1;
+  text-align: center;
+}

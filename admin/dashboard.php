@@ -5,6 +5,11 @@ $extraJS   = [["src" => "../assets/js/dashboard.js", "defer" => true]];
 include '../inc/conn.php';
 include '../inc/header.php';
 
+$alertMsg="";
+if (isset($_SESSION['alert'])) {
+    $alertMsg = $_SESSION['alert'];
+    unset($_SESSION['alert']);
+}
 $isLoggedIn = $_SESSION['loggedin'] ?? false;
 if (!$isLoggedIn) {
     $_SESSION['alert'] = "Please login.";
@@ -48,6 +53,13 @@ if (isset($_SESSION['admin_flash'])) {
 ?>
 
 <?php include '../inc/nav.php'; ?>
+<!-- alert display -->
+<?php if ($alertMsg): ?>
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+    <?php echo htmlspecialchars($alertMsg); ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
 
 <main class="admin-wrapper">
     <header class="admin-header">

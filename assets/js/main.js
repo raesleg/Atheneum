@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
+    // alert popup
     const alertBoxes = document.getElementsByClassName("alert");
     for (let i = 0; i < alertBoxes.length; i++) {
         const alertBox = alertBoxes[i];
