@@ -26,6 +26,12 @@ if (isset($_SESSION['error'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $errorMsg[] = "Invalid request. Please reload the page and try again.";
+        $success = false;
+    }
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
     $fname = sanitize_input($_POST['fname']);
     $lname = sanitize_input($_POST['lname']);
     $email = sanitize_input($_POST['email']);
@@ -108,13 +114,6 @@ if ($result->num_rows > 0) {
     $profilePic = $row["profile_pic"] ?? 'assets/images/default-avatar.jpg';
 }
 $stmt->close();
-
-function sanitize_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
 ?>
 
 <main>
@@ -134,6 +133,7 @@ function sanitize_input($data) {
     </div>
     <h1 class="profile-title">Your profile</h1>
     <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         <div class="profile">
             <div class="profile-details">
                 <div class="mb-3">
@@ -167,6 +167,92 @@ function sanitize_input($data) {
                 <button type="submit" class="btn btn-primary">Update</button>
             </div>
     </form>
+
+    <?php if (($_SESSION['role'] ?? '') !== 'admin'): ?>
+    <section class="delete-account-section">
+        <h2 class="delete-account-heading">Delete Account</h2>
+        <p class="delete-account-warning">
+            This action is permanent and cannot be undone. All your orders, reviews, and saved addresses will be removed.
+        </p>
+        <button type="button" class="btn btn-danger" id="deleteAccountBtn">Delete My Account</button>
+    </section>
+
+    // confirm delete account
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please enter your password to confirm. This will permanently delete your account and all associated data.</p>
+                    <div class="mb-3">
+                        <label class="form-label" for="deleteConfirmPwd">Password</label>
+                        <input type="password" class="form-control" id="deleteConfirmPwd" placeholder="Enter your password" required>
+                    </div>
+                    <div id="deleteAccountError" class="text-danger" style="font-size:0.85rem;" role="alert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Permanently</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </main>
+
+<script>let CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token']) ?>;</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var deleteBtn = document.getElementById('deleteAccountBtn');
+    if (!deleteBtn) return;
+
+    var modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+    var confirmBtn = document.getElementById('confirmDeleteBtn');
+    var pwdInput = document.getElementById('deleteConfirmPwd');
+    var errorDiv = document.getElementById('deleteAccountError');
+
+    deleteBtn.addEventListener('click', function () {
+        pwdInput.value = '';
+        errorDiv.textContent = '';
+        modal.show();
+    });
+
+    confirmBtn.addEventListener('click', async function () {
+        var password = pwdInput.value.trim();
+        if (!password) {
+            errorDiv.textContent = 'Password is required.';
+            return;
+        }
+
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Deleting…';
+        errorDiv.textContent = '';
+
+        try {
+            var res = await fetch('process_delete_account.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password, csrf_token: CSRF_TOKEN })
+            });
+            var data = await res.json();
+
+            if (data.success) {
+                window.location.href = 'index.php';
+            } else {
+                errorDiv.textContent = data.error || 'Could not delete account.';
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Delete Permanently';
+            }
+        } catch (err) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Delete Permanently';
+        }
+    });
+});
+</script>
 
 <?php include 'inc/footer.php'; ?>

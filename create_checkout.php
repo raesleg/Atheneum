@@ -14,6 +14,9 @@ if (!$isLoggedIn) {
     exit;
 }
 
+$data = validate_csrf_json();
+$newToken = $_SESSION['csrf_token'];
+
 // Build base URL dynamically
 $protocol        = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
 $host            = $_SERVER['HTTP_HOST'];

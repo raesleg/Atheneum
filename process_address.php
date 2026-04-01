@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 // POST save new address
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = validate_csrf_json();
+    $newToken = $_SESSION['csrf_token'];
 
     $label         = trim($data['label']         ?? '');
     $address_line1 = trim($data['address_line1'] ?? '');
@@ -43,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $country       = trim($data['country']       ?? '');
 
     if (!$label || !$address_line1 || !$city || !$postal_code || !$country) {
-        echo json_encode(['success' => false, 'error' => 'Please fill in all required fields.']);
+        echo json_encode(['success' => false, 'error' => 'Please fill in all required fields.', 'csrf_token' => $newToken]);
         exit;
     }
 
@@ -61,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     echo json_encode([
         'success' => true,
+        'csrf_token' => $newToken,
         'address' => [
             'addressId'     => $newId,
             'label'         => $label,
@@ -77,11 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // DELETE an address
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    $data      = json_decode(file_get_contents('php://input'), true);
+    $data = validate_csrf_json();
+    $newToken = $_SESSION['csrf_token'];
+
     $addressId = (int)($data['addressId'] ?? 0);
 
     if (!$addressId) {
-        echo json_encode(['success' => false, 'error' => 'Invalid address ID']);
+        echo json_encode(['success' => false, 'error' => 'Invalid address ID', 'csrf_token' => $newToken]);
         exit;
     }
 
@@ -90,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $stmt->execute();
     $stmt->close();
 
-    echo json_encode(['success' => true]);
+    echo json_encode(['success' => true, 'csrf_token' => $newToken]);
     exit;
 }
 
