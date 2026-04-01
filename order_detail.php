@@ -27,6 +27,11 @@ $stmt = $conn->prepare("
     LEFT JOIN OrderShipments s ON o.orderId = s.orderId
     WHERE o.orderId = ? AND o.userId = ?
 ");
+$userId = $_SESSION['userId'] ?? null;
+if (!$userId) {
+    header("Location: login.php");
+    exit();
+}
 $stmt->bind_param("ii", $orderId, $userId);
 $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
@@ -36,6 +41,14 @@ if (!$order) {
     header("Location: orders.php");
     exit();
 }
+
+// Refund logic to fetch details from the Refund table
+$refundInfo = null;
+$stmtRef = $conn->prepare("SELECT status, reason, admin_note, created_at FROM Refund WHERE orderId = ?");
+$stmtRef->bind_param("i", $orderId);
+$stmtRef->execute();
+$refundInfo = $stmtRef->get_result()->fetch_assoc();
+$stmtRef->close();
 
 $stmtItems = $conn->prepare("
     SELECT oi.*, p.title, p.author, p.cover_image
@@ -59,8 +72,8 @@ if ($shipmentStatus === 'delivered' && $order['delivered_at']) {
 
     if ($daysSince <= $REVIEW_WINDOW_DAYS) {
         foreach ($items as $item) {
-            $stmtRev = $conn->prepare("SELECT reviewId FROM Reviews WHERE username = ? AND productId = ?");
-            $stmtRev->bind_param("si", $username, $item['productId']);
+            $stmtRev = $conn->prepare("SELECT reviewId FROM Reviews WHERE userId = ? AND productId = ?");
+            $stmtRev->bind_param("ii", $userId, $item['productId']);
             $stmtRev->execute();
             $hasReview = $stmtRev->get_result()->num_rows > 0;
             $stmtRev->close();
@@ -87,7 +100,7 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
             <div>
                 <h1>Order #<?= $orderId ?></h1>
                 <p class="order-meta">
-                    Placed on 
+                    Placed on
                     <time datetime="<?= date('Y-m-d\TH:i', strtotime($order['created_at'])) ?>">
                         <?= date('d M Y, h:i A', strtotime($order['created_at'])) ?>
                     </time>
@@ -98,68 +111,75 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
             </span>
         </div>
 
-        <section class="shipment-tracker" id="shipmentTracker" 
-                 data-order-id="<?= $orderId ?>"
-                 data-current-status="<?= htmlspecialchars($shipmentStatus) ?>"
-                 aria-labelledby="tracker-title">
+        <?php
+        // Refund logic to display an alert if a refund has been requested
+        if ($refundInfo): ?>
+            <div class="alert <?= $refundInfo['status'] === 'approved' ? 'alert-success' : ($refundInfo['status'] === 'rejected' ? 'alert-danger' : 'alert-warning') ?> shadow-sm border-0 mb-4" role="alert" style="border-radius: 12px; padding: 1.5rem;">
+                <h5 class="alert-heading fw-bold mb-2">Refund Request: <?= ucfirst($refundInfo['status']) ?></h5>
+                <p class="mb-1"><strong>Reason:</strong> <?= htmlspecialchars($refundInfo['reason']) ?></p>
+                <?php if (!empty($refundInfo['admin_note'])): ?>
+                    <hr style="opacity: 0.1;">
+                    <p class="mb-0"><strong>Message from Atheneum:</strong> <?= htmlspecialchars($refundInfo['admin_note']) ?></p>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
-            <h2 class="tracker-title" id="tracker-title">Shipment Status</h2>
+        <?php
+        // Refund logic to hide the tracker if the order is refunded
+        if ($order['paymentStatus'] !== 'refunded'): ?>
+            <section class="shipment-tracker" id="shipmentTracker"
+                data-order-id="<?= $orderId ?>"
+                data-current-status="<?= htmlspecialchars($shipmentStatus) ?>"
+                aria-labelledby="tracker-title">
 
-            <div class="sr-only" aria-live="assertive" id="statusAnnouncement"></div>
+                <h2 class="tracker-title" id="tracker-title">Shipment Status</h2>
 
-            <ol class="tracker-steps" aria-label="Shipment progress steps">
-                <?php
-                $icons = [
-                    'order_placed'      => 'bi-receipt',
-                    'order_shipped'     => 'bi-box-seam',
-                    'in_transit'        => 'bi-truck',
-                    'out_for_delivery'  => 'bi-geo-alt',
-                    'delivered'         => 'bi-check-circle',
-                ];
-                ?>
-                <?php foreach ($STATUS_ORDER as $idx => $step): ?>
+                <div class="sr-only" aria-live="assertive" id="statusAnnouncement"></div>
+
+                <ol class="tracker-steps" aria-label="Shipment progress steps">
                     <?php
+                    $icons = [
+                        'order_placed'      => 'bi-receipt',
+                        'order_shipped'     => 'bi-box-seam',
+                        'in_transit'        => 'bi-truck',
+                        'out_for_delivery'  => 'bi-geo-alt',
+                        'delivered'         => 'bi-check-circle',
+                    ];
+                    ?>
+                    <?php foreach ($STATUS_ORDER as $idx => $step): ?>
+                        <?php
                         $isCompleted = $idx <= $statusIdx;
                         $isCurrent   = $idx === $statusIdx;
                         $timestamp   = $order[$step . '_at'] ?? null;
                         $stepState   = $isCurrent ? 'Current step' : ($isCompleted ? 'Completed' : 'Upcoming');
-                    ?>
-                    <li class="tracker-step <?= $isCompleted ? 'completed' : '' ?> <?= $isCurrent ? 'current' : '' ?>"
-                        data-step="<?= $step ?>" id="step-<?= $step ?>"
-                        aria-label="<?= $STATUS_LABELS[$step] ?>: <?= $stepState ?><?= $timestamp ? ', ' . date('d M, h:i A', strtotime($timestamp)) : '' ?>">
-                        <div class="step-icon-wrap">
-                            <div class="step-icon" aria-hidden="true">
-                                <i class="bi <?= $icons[$step] ?>"></i>
-                            </div>
-                            <?php if ($idx < count($STATUS_ORDER) - 1): ?>
-                                <div class="step-connector <?= $idx < $statusIdx ? 'completed' : '' ?>"
-                                     id="connector-<?= $step ?>" aria-hidden="true"></div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="step-info">
-                            <span class="step-label"><?= $STATUS_LABELS[$step] ?></span>
-                            <span class="step-time" id="time-<?= $step ?>">
-                                <?php if ($timestamp): ?>
-                                    <time datetime="<?= date('Y-m-d\TH:i', strtotime($timestamp)) ?>">
-                                        <?= date('d M, h:i A', strtotime($timestamp)) ?>
-                                    </time>
+                        ?>
+                        <li class="tracker-step <?= $isCompleted ? 'completed' : '' ?> <?= $isCurrent ? 'current' : '' ?>"
+                            data-step="<?= $step ?>" id="step-<?= $step ?>"
+                            aria-label="<?= $STATUS_LABELS[$step] ?>: <?= $stepState ?><?= $timestamp ? ', ' . date('d M, h:i A', strtotime($timestamp)) : '' ?>">
+                            <div class="step-icon-wrap">
+                                <div class="step-icon" aria-hidden="true">
+                                    <i class="bi <?= $icons[$step] ?>"></i>
+                                </div>
+                                <?php if ($idx < count($STATUS_ORDER) - 1): ?>
+                                    <div class="step-connector <?= $idx < $statusIdx ? 'completed' : '' ?>"
+                                        id="connector-<?= $step ?>" aria-hidden="true"></div>
                                 <?php endif; ?>
-                            </span>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
-            </ol>
-
-            <div class="transit-gif-container <?= $shipmentStatus === 'in_transit' ? 'visible' : '' ?>" 
-                 id="transitGif"
-                 role="img"
-                 aria-label="Animation showing package in transit">
-                <img src="<?= htmlspecialchars($TRANSIT_GIF_PATH) ?>" 
-                     alt="Package in transit animation" 
-                     class="transit-gif"
-                     onerror="this.parentElement.innerHTML='<div class=\'transit-placeholder\'><i class=\'bi bi-truck\' aria-hidden=\'true\'></i><span>Your package is on its way!</span></div>'">
-            </div>
-        </section>
+                            </div>
+                            <div class="step-info">
+                                <span class="step-label"><?= $STATUS_LABELS[$step] ?></span>
+                                <span class="step-time" id="time-<?= $step ?>">
+                                    <?php if ($timestamp): ?>
+                                        <time datetime="<?= date('Y-m-d\TH:i', strtotime($timestamp)) ?>">
+                                            <?= date('d M, h:i A', strtotime($timestamp)) ?>
+                                        </time>
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            </section>
+        <?php endif; ?>
 
         <section class="order-items-section" aria-labelledby="items-heading">
             <h2 class="section-heading" id="items-heading">Items in this Order</h2>
@@ -184,7 +204,7 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
                         </div>
 
                         <div class="order-item-right">
-                            <span class="order-item-price" aria-label="Item total: $<?= number_format($item['price_at_purchase'] * $item['quantity'], 2) ?>">
+                            <span class="order-item-price" role="text" aria-label="Item total: $<?= number_format($item['price_at_purchase'] * $item['quantity'], 2) ?>">
                                 $<?= number_format($item['price_at_purchase'] * $item['quantity'], 2) ?>
                             </span>
                             <?php if (isset($reviewEligible[$item['productId']])): ?>
@@ -201,7 +221,7 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
         <section class="order-summary-footer" aria-label="Order summary">
             <div class="summary-line">
                 <span>Order Total</span>
-                <span class="summary-total" aria-label="Order total: $<?= number_format($order['totalPrice'], 2) ?>">$<?= number_format($order['totalPrice'], 2) ?></span>
+                <span class="summary-total" role="text" aria-label="Order total: $<?= number_format($order['totalPrice'], 2) ?>">$<?= number_format($order['totalPrice'], 2) ?></span>
             </div>
             <div class="summary-line">
                 <span>Payment</span>
@@ -218,7 +238,6 @@ $jsStatusLabels = json_encode($STATUS_LABELS);
         timings: <?= $jsTimings ?>,
         statusOrder: <?= $jsStatusOrder ?>,
         statusLabels: <?= $jsStatusLabels ?>,
-        transitGifPath: '<?= htmlspecialchars($TRANSIT_GIF_PATH) ?>'
     };
 </script>
 

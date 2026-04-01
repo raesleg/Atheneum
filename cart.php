@@ -130,6 +130,76 @@ $total    = $subtotal + $shipping;
     </div>
 </main>
 
+<!-- ── Address Modal ── -->
+<div class="addr-overlay" id="addrOverlay" hidden>
+    <div class="addr-modal" role="dialog" aria-modal="true" aria-labelledby="addrModalTitle">
+ 
+        <div class="addr-modal-header">
+            <h2 id="addrModalTitle">Select Shipping Address</h2>
+            <button class="addr-close" id="closeAddrModal" aria-label="Close">&times;</button>
+        </div>
+ 
+        <!-- LIST VIEW -->
+        <div id="addrListView">
+            <div id="addrCards" class="addr-cards">
+                <div class="addr-loading"><i class="bi bi-arrow-repeat addr-spin"></i> Loading…</div>
+            </div>
+            <button class="addr-add-btn" id="showAddrForm">
+                <i class="bi bi-plus-circle"></i> Add a new address
+            </button>
+            <div id="addrSelectError" class="addr-select-error"></div>
+            <button class="addr-confirm-btn" id="confirmAddrBtn">Continue to Payment</button>
+        </div>
+ 
+        <!-- FORM VIEW -->
+        <div id="addrFormView" style="display:none">
+            <button class="addr-back-btn" id="backToList" type="button">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
+            <form id="addressForm" novalidate>
+                <div class="addr-field">
+                    <label for="addr_label">Label <span class="req">*</span></label>
+                    <input type="text" id="addr_label" name="label" placeholder="Home, Work, Dorm" required>
+                </div>
+                <div class="addr-field">
+                    <label for="addr_line1">Address Line 1 <span class="req">*</span></label>
+                    <input type="text" id="addr_line1" name="address_line1" placeholder="123 Main Street" required>
+                </div>
+                <div class="addr-field">
+                    <label for="addr_line2">Address Line 2 <span class="opt">(optional)</span></label>
+                    <input type="text" id="addr_line2" name="address_line2" placeholder="Apt, suite, unit, etc.">
+                </div>
+                <div class="addr-row">
+                    <div class="addr-field">
+                        <label for="addr_city">City <span class="req">*</span></label>
+                        <input type="text" id="addr_city" name="city" placeholder="New York" required>
+                    </div>
+                    <div class="addr-field">
+                        <label for="addr_state">State / Region</label>
+                        <input type="text" id="addr_state" name="state" placeholder="NY">
+                    </div>
+                </div>
+                <div class="addr-row">
+                    <div class="addr-field">
+                        <label for="addr_postal">Postal Code <span class="req">*</span></label>
+                        <input type="text" id="addr_postal" name="postal_code" placeholder="10001" required>
+                    </div>
+                    <div class="addr-field">
+                        <label for="addr_country">Country <span class="req">*</span></label>
+                        <input type="text" id="addr_country" name="country" placeholder="United States" required>
+                    </div>
+                </div>
+                <div id="addrFormError" class="addr-select-error"></div>
+                <div class="addr-form-actions">
+                    <button type="button" class="addr-cancel-btn" id="cancelAddrForm">Cancel</button>
+                    <button type="submit" class="addr-save-btn" id="saveAddrBtn">Save Address</button>
+                </div>
+            </form>
+        </div>
+ 
+    </div>
+</div>
+
 <script>
     const prices = <?= json_encode(array_column($cart_items, 'price', 'id')) ?>;
     const qtys = <?= json_encode(array_column($cart_items, 'qty', 'id')) ?>;

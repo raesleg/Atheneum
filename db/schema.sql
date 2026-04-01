@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS Cart (
 CREATE TABLE IF NOT EXISTS Addresses (
     addressId INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     userId INT UNSIGNED NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
+    label VARCHAR(50) NOT NULL,
     address_line1 VARCHAR(255) NOT NULL,
     address_line2 VARCHAR(255),
     city VARCHAR(100) NOT NULL,
@@ -128,20 +128,20 @@ CREATE TABLE IF NOT EXISTS FAQ (
 );
 
 CREATE TABLE IF NOT EXISTS Refund (
-    refundId    INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    orderId     INT UNSIGNED NOT NULL,
-    userId      INT UNSIGNED NOT NULL,
-    reason      TEXT         NOT NULL,
+    refundId    INT UNSIGNED  AUTO_INCREMENT PRIMARY KEY,
+    orderId     INT UNSIGNED  NULL,
+    userId      INT UNSIGNED  NOT NULL,
+    paymentId   VARCHAR(100)  NULL,
+    reason      TEXT          NOT NULL,
     status      ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-    admin_note  TEXT         NULL,
-    resolved_by INT UNSIGNED NULL,
-    resolved_at DATETIME     NULL,
-    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
- 
-    PRIMARY KEY (refundId),
-    CONSTRAINT fk_refund_order    FOREIGN KEY (orderId)  REFERENCES Orders(orderId)  ON DELETE CASCADE,
-    CONSTRAINT fk_refund_user     FOREIGN KEY (userId)   REFERENCES Users(userId)    ON DELETE CASCADE,
-    CONSTRAINT fk_refund_resolver FOREIGN KEY (resolved_by) REFERENCES Users(userId) ON DELETE SET NULL,
- 
+    admin_note  TEXT          NULL,
+    resolved_by INT UNSIGNED  NULL,
+    resolved_at DATETIME      NULL,
+    created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_refund_order    FOREIGN KEY (orderId)     REFERENCES Orders(orderId)  ON DELETE SET NULL,
+    CONSTRAINT fk_refund_user     FOREIGN KEY (userId)      REFERENCES Users(userId)    ON DELETE CASCADE,
+    CONSTRAINT fk_refund_resolver FOREIGN KEY (resolved_by) REFERENCES Users(userId)    ON DELETE SET NULL,
+
     UNIQUE KEY uq_refund_order (orderId)
 );

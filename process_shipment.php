@@ -4,8 +4,8 @@ header('Content-Type: application/json');
 include 'inc/conn.php';
 require_once 'config/shipment_config.php';
 
-$username = $_SESSION['username'] ?? null;
-if (!$username) {
+$userId = $_SESSION['userId'] ?? null;
+if (!$userId) {
     echo json_encode(['success' => false, 'error' => 'Not logged in.']);
     exit;
 }

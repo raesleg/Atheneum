@@ -88,15 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 400);
     }
 
-    function updateCartBadge(delta) {
-        var badge = document.getElementById('cart-count');
-        if (!badge) return;
-        var current = parseInt(badge.textContent) || 0;
-        var next = current + delta;
-        badge.textContent = next;
-        badge.style.display = next > 0 ? 'flex' : 'none';
-    }
-
     function escapeHtml(str) {
         return str
             .replace(/&/g, '&amp;')
