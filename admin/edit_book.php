@@ -52,7 +52,8 @@ if (!isset($_GET['id']) || !filter_var($_GET['id'], FILTER_VALIDATE_INT, ['optio
         if ($raw_cover !== '') {
             $norm = str_replace('\\', '/', $raw_cover);
             $norm = preg_replace('#\.\./#', '', $norm);
-            if (strpos($norm, 'assets/images/covers/') === 0) {
+            // Fixed the path allow it to find the images
+            if (strpos($norm, 'assets/images/') === 0) {
                 $cover_image = $norm;
             }
         }

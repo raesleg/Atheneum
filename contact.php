@@ -147,7 +147,8 @@ if (empty($_SESSION['csrf_token'])) {
                 src="https://www.openstreetmap.org/export/embed.html?bbox=103.8480,1.2830,103.8560,1.2870&layer=mapnik&marker=1.2847,103.8521"
                 title="Map showing Atheneum at 1 Raffles Place, Singapore"
                 loading="lazy"
-                aria-label="Map of Atheneum store location">
+                aria-hidden="true"
+                tabindex="-1">
             </iframe>
         </div>
     </aside>
