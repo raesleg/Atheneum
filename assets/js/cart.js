@@ -301,16 +301,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Change quantity 
     function changeQty(id, delta) {
-        const current = qtys[id] || 1;
-        const next    = current + delta;
+        const current = Number(qtys[id] ?? 0);
+        const next = current + delta;
 
-        // Reduce to 0 = remove item
         if (next <= 0) {
             removeItem(id);
             return;
         }
 
-        // Exceeds stock
         if (next > stocks[id]) {
             showQtyError(id, 'Only ' + stocks[id] + ' in stock');
             return;
@@ -318,17 +316,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         clearQtyError(id);
         qtys[id] = next;
-        document.getElementById('qty-'   + id).textContent = next;
-        document.getElementById('total-' + id).textContent = '$' + (prices[id] * next).toFixed(2);
-        recalc();
+
 
         fetch('process_cart.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'update', productId: id, qty: next })
+        }).then(() => {
+            document.getElementById('qty-' + id).textContent = next;
+            document.getElementById('total-' + id).textContent = '$' + (prices[id] * next).toFixed(2);
+            recalc();
+            updateItemCount();
         });
     }
-
+    
     // Remove item
     function removeItem(id) {
         const el = document.getElementById('item-' + id);
@@ -353,12 +354,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateItemCount() {
-        const remaining = Object.keys(qtys).length;
-        const label = document.querySelector('.section-label');
+        let remaining = 0;
+        for (const id in qtys) {
+            remaining += Number(qtys[id]) || 0;
+        }
+
+        const label = document.getElementById('cart-item-count');
         if (label) {
             label.textContent = remaining + ' item' + (remaining !== 1 ? 's' : '');
         }
-        // If cart is now empty, show empty state without full page reload
+
         if (remaining === 0) {
             const wrapper = document.querySelector('.cart-wrapper');
             if (wrapper) {
@@ -429,6 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/'/g, '&#039;');
     }
 
+    updateItemCount();
     window.changeQty  = changeQty;
     window.removeItem = removeItem;
 

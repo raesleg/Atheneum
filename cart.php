@@ -4,7 +4,7 @@ $extraCSS = [
     "assets/css/cart.css"
 ];
 $extraJS = [
-    ["src" => "assets/js/cart.js", "defer" => true]
+    ["src" => "assets/js/cart.js?v=" . time(), "defer" => true]
 ];
 include 'inc/conn.php'; 
 include 'inc/header.php';
@@ -64,7 +64,13 @@ $total    = $subtotal + $shipping;
 
         <!-- Items Column -->
         <div class="cart-items-col">
-            <p class="section-label"><?= count($cart_items) ?> item<?= count($cart_items) !== 1 ? 's' : '' ?></p>
+            <?php
+                $totalItems = 0;
+                foreach ($cart_items as $item) {
+                    $totalItems += (int)$item['qty'];
+                }
+            ?>
+            <p id="cart-item-count" class="section-label"><?= $totalItems ?> item<?= $totalItems !== 1 ? 's' : '' ?></p>
 
             <?php foreach ($cart_items as $item): ?>
             <div class="cart-item" id="item-<?= $item['id'] ?>">
