@@ -108,13 +108,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-function sanitize_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
-
 function authenticateUser($conn) {
     global $username, $fname, $lname, $email, $pwd_hashed, $errorMsg, $success;
 

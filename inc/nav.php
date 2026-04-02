@@ -74,11 +74,6 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <!-- Right Icons -->
             <div class="nav-icons d-flex align-items-center gap-3">
-                <a href="<?= $baseUrl ?>/products.php" class="icon-link">
-                    <i class="bi bi-search" aria-hidden="true"></i>
-                    <span class="visually-hidden">Search Products</span>
-                </a>
-
                 <?php if ($isLoggedIn): ?>
                     <a href="<?= $baseUrl ?>/cart.php" class="icon-link position-relative">
                         <i class="bi bi-bag"></i>
