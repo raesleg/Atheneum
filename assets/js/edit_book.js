@@ -2,7 +2,6 @@ document.getElementById('cover-input').addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Show the new preview replacing the current-cover block
     let preview = document.getElementById('new-cover-preview');
     if (!preview) {
         preview = document.createElement('img');

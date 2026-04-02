@@ -130,11 +130,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     productId: productId,
                     orderId: orderId,
                     rating: rating,
-                    comment: comment
+                    comment: comment,
+                    csrf_token: CSRF_TOKEN
                 })
             })
             .then(function (r) { return r.json(); })
             .then(function (data) {
+                if (data.csrf_token) CSRF_TOKEN = data.csrf_token;
                 if (data.success) {
                     var formCard = document.getElementById('reviewFormCard');
                     formCard.innerHTML =

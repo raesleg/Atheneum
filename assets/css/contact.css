@@ -69,7 +69,7 @@
 .contact-success i { font-size: 1.2rem; margin-top: 0.1rem; flex-shrink: 0; }
 .contact-errors  { background: #fde8e8; border: 1px solid #f5c6c6; color: #8b1a1a; }
 .contact-errors i { font-size: 1.1rem; margin-top: 0.15rem; flex-shrink: 0; }
-.contact-errors ul { margin: 0; padding-left: 1rem; }
+.error-msg-content { display: flex; flex-direction: column; gap: 0.25rem; }
 .contact-success strong { display: block; margin-bottom: 0.25rem; }
 .contact-success p { margin: 0; }
 

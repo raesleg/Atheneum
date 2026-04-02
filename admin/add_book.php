@@ -85,14 +85,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!in_array($mimeType, $allowed_mime, true)) {
                     $errorMsg .= "Cover image content does not match its extension.<br>";
                 } else {
-                    $uploadDir = '../assets/images/covers/';
+                    // Save to genre-specific folder
+                    $uploadBase = dirname(__DIR__) . '/assets/images/';
+                    $uploadDir  = $uploadBase . $genre . '/';
                     if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
                     
-                    $filename = uniqid('book_') . '.' . $ext;
+                    // Use sanitized original name instead of uniqid
+                    $originalName = pathinfo($_FILES['cover_image']['name'], PATHINFO_FILENAME);
+                    $sanitizedName = preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $originalName);
+                    $filename = $sanitizedName . '.' . $ext;
                     $dest     = $uploadDir . $filename;
                     
+                    // Duplicate prevention, if file exists add a suffix
+                    if (file_exists($dest)) {
+                        $filename = $sanitizedName . '_' . time() . '.' . $ext;
+                        $dest     = $uploadDir . $filename;
+                    }
+                    
                     if (move_uploaded_file($_FILES['cover_image']['tmp_name'], $dest)) {
-                        $cover_image = 'assets/images/covers/' . $filename;
+                        $cover_image = 'assets/images/' . $genre . '/' . $filename;
                     } else {
                         $errorMsg .= "Failed to upload image.<br>";
                     }

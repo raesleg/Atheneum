@@ -17,7 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = validate_csrf_json();
+$newToken = $_SESSION['csrf_token'];
 
 $productId = isset($data['productId']) ? (int)$data['productId'] : 0;
 $orderId   = isset($data['orderId'])   ? (int)$data['orderId']   : 0;
@@ -92,6 +93,7 @@ if ($stmtInsert->execute()) {
 
     echo json_encode([
         'success'     => true,
+        'csrf_token'  => $newToken,
         'review'      => [
             'rating'      => $rating,
             'comment'     => $comment,

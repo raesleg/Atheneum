@@ -2,7 +2,7 @@
 $pageTitle = "Profile";
 $extraCSS = ["assets/css/profile.css"];
 $extraJS = [["src" => "assets/js/main.js", "defer" => true]];
-include 'inc/conn.php'; 
+include 'inc/conn.php';
 include 'inc/header.php';
 
 if (!$isLoggedIn) {
@@ -26,6 +26,12 @@ if (isset($_SESSION['error'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $errorMsg[] = "Invalid request. Please reload the page and try again.";
+        $success = false;
+    }
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
     $fname = sanitize_input($_POST['fname']);
     $lname = sanitize_input($_POST['lname']);
     $email = sanitize_input($_POST['email']);
@@ -36,16 +42,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fileTmp   = $_FILES['profile_pic']['tmp_name'];
     $fileName  = $_FILES['profile_pic']['name'];
 
-    //file uploaded successfully
+    // file uploaded successfully
     if ($fileError === 0){
         $tmpPath = $fileTmp;
 
         // Sanitise and validate file upload
         if ($tmpPath && file_exists($tmpPath)) {
-            $uploadDir = 'uploads/profile_pic/'; 
-            if (!is_dir($uploadDir)){
+            $uploadDir = 'uploads/profile_pic/';
+            if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
-            } 
+            }
 
             // regex to replace non alphanumeric characters with _
             $fileName = time() . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", basename($_FILES['profile_pic']['name']));
@@ -60,23 +66,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) {
                     $errorMsg[] = "File too large (max 2MB).";
                     $success = false;
-                } 
-                else {
+                } else {
                     // add file to server
                     if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFilePath)) {
-                        $profilePicPath = $targetFilePath; 
-                    }
-                    else{
+                        $profilePicPath = $targetFilePath;
+                    } else {
                         $errorMsg[] = "Error uploading file.";
                         $success = false;
                     }
                 }
-            }
-            else{
+            } else {
                 $errorMsg[] = "Invalid file type. Only images are allowed.";
                 $success = false;
             }
-         
         }
     }
     // File size exceed web server size set as 2MB
@@ -84,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errorMsg[] = "File too large (max 2MB).";
         $success = false;
     } 
-    // if file not uploaded successfully
+    // File was not uploaded successfully
     elseif ($fileError !== UPLOAD_ERR_NO_FILE) {
         $errorMsg[] = "Error uploading file.";
         $success = false;
@@ -96,17 +98,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bind_param("sssss", $fname, $lname, $email, $profilePicPath, $username);
             $stmt->execute();
             $stmt->close();
-            } 
-        else {
+        } else {
             $stmt = $conn->prepare("UPDATE Users SET fname=?, lname=?, email=? WHERE username=?");
             $stmt->bind_param("ssss", $fname, $lname, $email, $username);
             $stmt->execute();
             $stmt->close();
-            
         }
-        $alertMsg="Profile updated successfully.";
+        $alertMsg = "Profile updated successfully.";
     }
-} 
+}
 
 include 'inc/nav.php';
 $stmt = $conn->prepare("SELECT username, fname, lname, email, profile_pic FROM Users WHERE username=?");
@@ -122,32 +122,26 @@ if ($result->num_rows > 0) {
     $profilePic = $row["profile_pic"] ?? 'assets/images/default-avatar.jpg';
 }
 $stmt->close();
-
-function sanitize_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
 ?>
 
 <main>
     <?php if ($alertMsg): ?>
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        <?php echo htmlspecialchars($alertMsg); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <?php echo htmlspecialchars($alertMsg); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
     <div class="error">
         <?php foreach ($errorMsg as $error): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($error); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <?php echo htmlspecialchars($error); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endforeach; ?>
     </div>
     <h1 class="profile-title">Your profile</h1>
     <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         <div class="profile">
             <div class="profile-details">
                 <div class="mb-3">
@@ -178,8 +172,8 @@ function sanitize_input($data) {
             </div>
         </div>
         <div class="submit">
-                <button type="submit" class="btn btn-primary">Update</button>
-            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
     </form>
 </main>
 

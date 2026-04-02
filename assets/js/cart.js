@@ -175,12 +175,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const res = await fetch('process_address.php', {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ addressId: id })
+                        body: JSON.stringify({ addressId: id, csrf_token: CSRF_TOKEN })
                     });
 
                     const text = await res.text();
                     const jsonStart = text.indexOf('{');
                     const data = JSON.parse(jsonStart > -1 ? text.slice(jsonStart) : text);
+
+                    if (data.csrf_token) CSRF_TOKEN = data.csrf_token;
 
                     if (!data.success) {
                         alert('Could not delete address.');
@@ -215,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
             state: addressForm.state.value.trim(),
             postal_code: addressForm.postal_code.value.trim(),
             country: addressForm.country.value.trim(),
+            csrf_token: CSRF_TOKEN,
         };
 
         try {
@@ -225,6 +228,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const data = await res.json();
+
+            if (data.csrf_token) CSRF_TOKEN = data.csrf_token;
 
             if (!data.success) {
                 formError.textContent = data.error || 'Could not save address.';
@@ -262,9 +267,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const res  = await fetch('create_checkout.php', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ addressId: selectedAddressId })
+                body:    JSON.stringify({ addressId: selectedAddressId, csrf_token: CSRF_TOKEN })
             });
             const data = await res.json();
+
+            if (data.csrf_token) CSRF_TOKEN = data.csrf_token;
  
             if (data.success && data.url) {
                 window.location.href = data.url;
@@ -321,8 +328,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('process_cart.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'update', productId: id, qty: next })
-        }).then(() => {
+            body: JSON.stringify({ action: 'update', productId: id, qty: next, csrf_token: CSRF_TOKEN })
+        }).then(r => r.json()).then(data => {
+            if (data.csrf_token) CSRF_TOKEN = data.csrf_token;
             document.getElementById('qty-' + id).textContent = next;
             document.getElementById('total-' + id).textContent = '$' + (prices[id] * next).toFixed(2);
             recalc();
@@ -340,8 +348,9 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('process_cart.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'remove', productId: id })
-        }).then(() => {
+            body: JSON.stringify({ action: 'remove', productId: id, csrf_token: CSRF_TOKEN })
+        }).then(r => r.json()).then(data => {
+            if (data.csrf_token) CSRF_TOKEN = data.csrf_token;
             setTimeout(() => {
                 el.remove();
                 delete prices[id];

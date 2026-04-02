@@ -46,7 +46,7 @@ $stmt->close();
             <div role="list" aria-label="Your orders">
                 <?php foreach ($orders as $order): ?>
                     <?php
-                    // [REFUND-LOGIC] Check if order is fully refunded or rejected
+                    // Check if order is fully refunded or rejected
                     $isRefunded  = ($order['paymentStatus'] === 'refunded');
                     $isRejected  = ($order['refundStatus'] === 'rejected');
 
@@ -66,17 +66,17 @@ $stmt->close();
                                 <span class="order-total">$<?= number_format($order['totalPrice'], 2) ?></span>
                                 <span class="status-pill <?= $statusClass ?>"><?= htmlspecialchars($statusLabel) ?></span>
                                 <?php
-                                // [REFUND-LOGIC] Show additional pills for pending or rejected refunds
+                                // Show additional pills for pending or rejected refunds
                                 if ($isRejected): ?>
-                                    <span class="status-pill refund-rejected" aria-label="Refund request rejected">Refund Rejected</span>
+                                    <span class="status-pill refund-rejected">Refund Rejected</span>
                                 <?php elseif ($order['refundStatus'] === 'pending'): ?>
-                                    <span class="status-pill refund-pending" aria-label="Refund request pending">Refund Pending</span>
+                                    <span class="status-pill refund-pending">Refund Pending</span>
                                 <?php endif; ?>
                             </div>
                         </div>
 
                         <?php
-                        // [REFUND-LOGIC] Hide tracker if refunded
+                        // Hide tracker if refunded
                         if (!$isRefunded): ?>
                             <div class="mini-tracker" role="progressbar"
                                 aria-valuenow="<?= $statusIdx + 1 ?>"
@@ -92,7 +92,7 @@ $stmt->close();
                                     </div>
                                 <?php endforeach; ?>
                             </div>
-                        <?php endif; // [REFUND-LOGIC] Close if (!$isRefunded) 
+                        <?php endif;
                         ?>
 
                         <div class="order-card-footer">

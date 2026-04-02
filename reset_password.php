@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     $email = $_POST['email'];
-    $stmt = $conn->prepare("SELECT userId FROM users WHERE email=?");
+    $stmt = $conn->prepare("SELECT userId FROM Users WHERE email=?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $token = bin2hex(random_bytes(32));
         $expiry = date("Y-m-d H:i:s", time() + 3600); // set link expiry to 1 hour
 
-        $stmt = $conn->prepare("UPDATE users SET reset_token=?, reset_expiry=? WHERE email=?");
+        $stmt = $conn->prepare("UPDATE Users SET reset_token=?, reset_expiry=? WHERE email=?");
         $stmt->bind_param("sss", $token, $expiry, $email);
         $stmt->execute();
 

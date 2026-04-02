@@ -210,6 +210,7 @@ $total    = $subtotal + $shipping;
     const prices = <?= json_encode(array_column($cart_items, 'price', 'id')) ?>;
     const qtys = <?= json_encode(array_column($cart_items, 'qty', 'id')) ?>;
     const stocks = <?= json_encode(array_column($cart_items, 'stock', 'id')) ?>;
+    let CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token']) ?>;
 </script>
 
 <?php include 'inc/footer.php'; ?>

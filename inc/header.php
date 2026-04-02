@@ -14,9 +14,6 @@ $hostWithoutPort = explode(':', $host)[0];
 $isLocal         = in_array($hostWithoutPort, ['localhost', '127.0.0.1']);
 $basePath        = $isLocal ? '/Atheneum' : '';
 $baseUrl         = $protocol . $host . $basePath;
-//for localhost testing
-// $basePath = '';
-// $baseUrl  = $protocol . $host . $basePath;
 ?>
 
 <!DOCTYPE html>

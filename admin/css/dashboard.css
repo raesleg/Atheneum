@@ -539,7 +539,16 @@ body.panel-open {
 }
 
 .rp-feedback:not(:empty) {
-    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px 24px;
+    margin-bottom: 2.5rem;
+    line-height: 1.1;
+    box-sizing: border-box;
+    overflow: visible;
+    min-height: 52px;
 }
 
 .rp-feedback-success {
@@ -614,9 +623,4 @@ body.panel-open {
     .rp-meta-grid {
         grid-template-columns: 1fr;
     }
-}
-
-.alert{
-  z-index: 1;
-  text-align: center;
 }

@@ -15,13 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('process_cart.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'add', productId: pid, qty: 1 })
+            body: JSON.stringify({ action: 'add', productId: pid, qty: 1, csrf_token: CSRF_TOKEN })
         })
         .then(function (r) {
             if (!r.ok) throw new Error('Network response was not ok');
             return r.json();
         })
         .then(function (data) {
+            if (data.csrf_token) CSRF_TOKEN = data.csrf_token;
             btn.disabled = false;
 
             if (!data.success) {
