@@ -2,7 +2,7 @@
 $pageTitle = "Profile";
 $extraCSS = ["assets/css/profile.css"];
 $extraJS = [["src" => "assets/js/main.js", "defer" => true]];
-include 'inc/conn.php'; 
+include 'inc/conn.php';
 include 'inc/header.php';
 
 if (!$isLoggedIn) {
@@ -35,21 +35,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fname = sanitize_input($_POST['fname']);
     $lname = sanitize_input($_POST['lname']);
     $email = sanitize_input($_POST['email']);
-    
+
     // if user uploaded a new pic and there was an error
     if (!empty($_FILES['profile_pic']['name']) && $_FILES['profile_pic']['error'] !== 0) {
         $errorMsg[] = "File upload error.";
         $success = false;
-    }        
-    else {
+    } else {
         $tmpPath = $_FILES['profile_pic']['tmp_name'];
 
         // Sanitise and validate file upload
         if ($tmpPath && file_exists($tmpPath)) {
-            $uploadDir = 'uploads/profile_pic/'; 
-            if (!is_dir($uploadDir)){
+            $uploadDir = 'uploads/profile_pic/';
+            if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
-            } 
+            }
 
             // regex to replace non alphanumeric characters with _
             $fileName = time() . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", basename($_FILES['profile_pic']['name']));
@@ -64,23 +63,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) {
                     $errorMsg[] = "File too large (max 2MB).";
                     $success = false;
-                } 
-                else {
+                } else {
                     // add file to server
                     if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFilePath)) {
-                        $profilePicPath = $targetFilePath; 
-                    }
-                    else{
+                        $profilePicPath = $targetFilePath;
+                    } else {
                         $errorMsg[] = "Error uploading file.";
                         $success = false;
                     }
                 }
-            }
-            else{
+            } else {
                 $errorMsg[] = "Invalid file type. Only images are allowed.";
                 $success = false;
             }
-        }  
+        }
     }
     if ($success) {
         if ($profilePicPath != null) {
@@ -88,17 +84,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bind_param("sssss", $fname, $lname, $email, $profilePicPath, $username);
             $stmt->execute();
             $stmt->close();
-            } 
-        else {
+        } else {
             $stmt = $conn->prepare("UPDATE Users SET fname=?, lname=?, email=? WHERE username=?");
             $stmt->bind_param("ssss", $fname, $lname, $email, $username);
             $stmt->execute();
             $stmt->close();
-            
         }
-        $alertMsg="Profile updated successfully.";
+        $alertMsg = "Profile updated successfully.";
     }
-} 
+}
 
 include 'inc/nav.php';
 $stmt = $conn->prepare("SELECT username, fname, lname, email, profile_pic FROM Users WHERE username=?");
@@ -119,15 +113,15 @@ $stmt->close();
 <main>
     <?php if ($alertMsg): ?>
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        <?php echo htmlspecialchars($alertMsg); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <?php echo htmlspecialchars($alertMsg); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
     <div class="error">
         <?php foreach ($errorMsg as $error): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <?php echo htmlspecialchars($error); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <?php echo htmlspecialchars($error); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endforeach; ?>
     </div>
@@ -164,95 +158,103 @@ $stmt->close();
             </div>
         </div>
         <div class="submit">
-                <button type="submit" class="btn btn-primary">Update</button>
-            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
     </form>
 
     <?php if (($_SESSION['role'] ?? '') !== 'admin'): ?>
-    <section class="delete-account-section">
-        <h2 class="delete-account-heading">Delete Account</h2>
-        <p class="delete-account-warning">
-            This action is permanent and cannot be undone. All your orders, reviews, and saved addresses will be removed.
-        </p>
-        <button type="button" class="btn btn-danger" id="deleteAccountBtn">Delete My Account</button>
-    </section>
+        <div class="profile">
+            <div class="profile-details">
+                <div class="mb-3">
+                    <label>Delete Account</label>
+                    <p class="form-control-plaintext">This action is permanent and cannot be undone. All your orders, reviews, and saved addresses will be removed.</p>
+                </div>
+                <button type="button" class="btn btn-outline-danger" id="deleteAccountBtn">Delete My Account</button>
+            </div>
+        </div>
 
-    // confirm delete account
-    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Please enter your password to confirm. This will permanently delete your account and all associated data.</p>
-                    <div class="mb-3">
-                        <label class="form-label" for="deleteConfirmPwd">Password</label>
-                        <input type="password" class="form-control" id="deleteConfirmPwd" placeholder="Enter your password" required>
+        <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div id="deleteAccountError" class="text-danger" style="font-size:0.85rem;" role="alert"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Permanently</button>
+                    <div class="modal-body">
+                        <p>Please enter your password to confirm. This will permanently delete your account and all associated data.</p>
+                        <div class="mb-3">
+                            <label class="form-label" for="deleteConfirmPwd">Password</label>
+                            <input type="password" class="form-control" id="deleteConfirmPwd" placeholder="Enter your password" required>
+                        </div>
+                        <div id="deleteAccountError" class="text-danger" style="font-size:0.85rem;" role="alert"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Permanently</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     <?php endif; ?>
 </main>
 
-<script>let CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token']) ?>;</script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var deleteBtn = document.getElementById('deleteAccountBtn');
-    if (!deleteBtn) return;
+    let CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token']) ?>;
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteBtn = document.getElementById('deleteAccountBtn');
+        if (!deleteBtn) return;
 
-    var modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
-    var confirmBtn = document.getElementById('confirmDeleteBtn');
-    var pwdInput = document.getElementById('deleteConfirmPwd');
-    var errorDiv = document.getElementById('deleteAccountError');
+        var modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+        var confirmBtn = document.getElementById('confirmDeleteBtn');
+        var pwdInput = document.getElementById('deleteConfirmPwd');
+        var errorDiv = document.getElementById('deleteAccountError');
 
-    deleteBtn.addEventListener('click', function () {
-        pwdInput.value = '';
-        errorDiv.textContent = '';
-        modal.show();
-    });
+        deleteBtn.addEventListener('click', function() {
+            pwdInput.value = '';
+            errorDiv.textContent = '';
+            modal.show();
+        });
 
-    confirmBtn.addEventListener('click', async function () {
-        var password = pwdInput.value.trim();
-        if (!password) {
-            errorDiv.textContent = 'Password is required.';
-            return;
-        }
+        confirmBtn.addEventListener('click', async function() {
+            var password = pwdInput.value.trim();
+            if (!password) {
+                errorDiv.textContent = 'Password is required.';
+                return;
+            }
 
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Deleting…';
-        errorDiv.textContent = '';
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Deleting…';
+            errorDiv.textContent = '';
 
-        try {
-            var res = await fetch('process_delete_account.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: password, csrf_token: CSRF_TOKEN })
-            });
-            var data = await res.json();
+            try {
+                var res = await fetch('process_delete_account.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        password: password,
+                        csrf_token: CSRF_TOKEN
+                    })
+                });
+                var data = await res.json();
 
-            if (data.success) {
-                window.location.href = 'index.php';
-            } else {
-                errorDiv.textContent = data.error || 'Could not delete account.';
+                if (data.success) {
+                    window.location.href = 'index.php';
+                } else {
+                    errorDiv.textContent = data.error || 'Could not delete account.';
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Delete Permanently';
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
                 confirmBtn.disabled = false;
                 confirmBtn.textContent = 'Delete Permanently';
             }
-        } catch (err) {
-            errorDiv.textContent = 'Network error. Please try again.';
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = 'Delete Permanently';
-        }
+        });
     });
-});
 </script>
 
 <?php include 'inc/footer.php'; ?>
