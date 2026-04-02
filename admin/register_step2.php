@@ -76,41 +76,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$result->success) {
         $errorMsg[] = "Please complete the reCAPTCHA.";
     } 
-    else {
-        // If picture uploaded
-        if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
-            $checkMime = getimagesize($_FILES['profile_pic']['tmp_name']);
-            $fileType = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
-            $allowTypes = ['jpg','jpeg','png','gif'];
 
-            // check file type
+    // If picture uploaded
+    if (isset($_FILES['profile_pic'])) {
+        $fileError = $_FILES['profile_pic']['error'];
+        $fileSize  = $_FILES['profile_pic']['size'];
+        $fileTmp   = $_FILES['profile_pic']['tmp_name'];
+        $fileName  = $_FILES['profile_pic']['name'];
+
+        // File upload successfully
+        if ($fileError === 0) {
+            // Check file size (<2MB)
+            if ($fileSize > 2 * 1024 * 1024) {
+                $errorMsg[] = "File too large (max 2MB).";
+                $success = false;
+            }
+
+            // Check file type
+            $checkMime = getimagesize($fileTmp);
+            $fileType  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $allowTypes = ['jpg','jpeg','png','gif'];
             if ($checkMime === false || !in_array($fileType, $allowTypes)) {
                 $errorMsg[] = "Invalid file type. Only images are allowed.";
                 $success = false;
             }
+            if ($success) {
+                $uploadDir = '../uploads/profile_pic/';
+                    
+                if (!is_dir($uploadDir)){
+                    mkdir($uploadDir, 0755, true);
+                } 
 
-            // check file size is <2mb
-            if ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) {
-                $errorMsg[] = "File too large (max 2MB).";
-                $success = false;
+                // Ensure file name does not contain any invalid characters
+                $fileName = time() . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", basename($_FILES['profile_pic']['name']));
+                $targetFilePath = $uploadDir . $fileName;
+
+                // Move validated file to web server
+                if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFilePath)) {
+                    $profilePicPath = $targetFilePath;
+                } 
+                else {
+                    $errorMsg[] = "Error uploading file.";
+                    $success = false;
+                }
             }
-            $uploadDir = '../uploads/profile_pic/';
-            
-            if (!is_dir($uploadDir)){
-                mkdir($uploadDir, 0755, true);
-            } 
+        } 
 
-            // Ensure file does not contain any invalid characters
-            $fileName = time() . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", basename($_FILES['profile_pic']['name']));
-            $targetFilePath = $uploadDir . $fileName;
-
-            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $targetFilePath)) {
-                $profilePicPath = $targetFilePath;
-            } else {
-                $errorMsg[] = "Error uploading file.";
-                $success = false;
-                exit();
-            }
+        // if file exceed the size set from the webserver.
+        // webserver upload max filesize is 2mb
+        elseif ($fileError === UPLOAD_ERR_INI_SIZE) {
+            $errorMsg[] = "File too large (max 2MB).";
+            $success = false;
+        } 
+        // if file not uploaded successfully
+        elseif ($fileError !== UPLOAD_ERR_NO_FILE) {
+            $errorMsg[] = "Error uploading file.";
+            $success = false;
         }
 
         if ($success) { 

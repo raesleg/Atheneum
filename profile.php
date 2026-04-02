@@ -29,14 +29,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fname = sanitize_input($_POST['fname']);
     $lname = sanitize_input($_POST['lname']);
     $email = sanitize_input($_POST['email']);
-    
-    // if user uploaded a new pic and there was an error
-    if (!empty($_FILES['profile_pic']['name']) && $_FILES['profile_pic']['error'] !== 0) {
-        $errorMsg[] = "File upload error.";
-        $success = false;
-    }        
-    else {
-        $tmpPath = $_FILES['profile_pic']['tmp_name'];
+
+    // file details
+    $fileError = $_FILES['profile_pic']['error'];
+    $fileSize  = $_FILES['profile_pic']['size'];
+    $fileTmp   = $_FILES['profile_pic']['tmp_name'];
+    $fileName  = $_FILES['profile_pic']['name'];
+
+    //file uploaded successfully
+    if ($fileError === 0){
+        $tmpPath = $fileTmp;
 
         // Sanitise and validate file upload
         if ($tmpPath && file_exists($tmpPath)) {
@@ -74,8 +76,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $errorMsg[] = "Invalid file type. Only images are allowed.";
                 $success = false;
             }
-        }  
+         
+        }
     }
+    // File size exceed web server size set as 2MB
+     elseif ($fileError === UPLOAD_ERR_INI_SIZE) {
+        $errorMsg[] = "File too large (max 2MB).";
+        $success = false;
+    } 
+    // if file not uploaded successfully
+    elseif ($fileError !== UPLOAD_ERR_NO_FILE) {
+        $errorMsg[] = "Error uploading file.";
+        $success = false;
+    }     
+
     if ($success) {
         if ($profilePicPath != null) {
             $stmt = $conn->prepare("UPDATE Users SET fname=?, lname=?, email=?, profile_pic=? WHERE username=?");
