@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 include '../inc/conn.php';
+include 'email_reply.php';
 
 $isLoggedIn = $_SESSION['loggedin'] ?? false;
 $adminId = $_SESSION['userId'] ?? null;
@@ -24,7 +25,7 @@ if (!$row || $row['role'] !== 'admin') {
 }
 
 $data = json_decode(file_get_contents('php://input'), true) ?? [];
-$refundId = isset($data['refundId']) ? (int)$data['refundId'] : 0;
+$refundId = isset($data['refundId']) ? (int) $data['refundId'] : 0;
 $action = $data['action'] ?? '';
 $adminNote = substr(trim($data['adminNote'] ?? ''), 0, 1000);
 
@@ -34,15 +35,21 @@ if (empty($csrfToken) || $csrfToken !== ($_SESSION['csrf_token'] ?? '')) {
     echo json_encode(['success' => false, 'message' => 'Invalid request. Please reload the page and try again.', 'new_csrf_token' => $_SESSION['csrf_token'] ?? '']);
     exit;
 }
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // rotate after use
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 if ($refundId <= 0 || !in_array($action, ['approve', 'reject'], true)) {
     echo json_encode(['success' => false, 'message' => 'Invalid parameters.', 'new_csrf_token' => $_SESSION['csrf_token']]);
     exit;
 }
 
-// get the refund request
-$stmt = $conn->prepare("SELECT * FROM Refund WHERE refundId = ? AND status = 'pending'");
+
+// Get the refund request with user email if can
+$stmt = $conn->prepare("
+    SELECT r.*, u.fname, u.lname, u.email as reg_email, r.name as contact_name, r.email as contact_email
+    FROM Refund r 
+    LEFT JOIN Users u ON r.userId = u.userId
+    WHERE r.refundId = ? AND r.status = 'pending'
+");
 $stmt->bind_param("i", $refundId);
 $stmt->execute();
 $refund = $stmt->get_result()->fetch_assoc();
@@ -50,6 +57,12 @@ $stmt->close();
 
 if (!$refund) {
     echo json_encode(['success' => false, 'message' => 'Request not found or already resolved.', 'new_csrf_token' => $_SESSION['csrf_token']]);
+    exit;
+}
+
+// 4. Check if rejection is allowed for this type
+if ($action === 'reject' && $refund['type'] !== 'Refund') {
+    echo json_encode(['success' => false, 'message' => 'Enquiries cannot be rejected. Please provide a reply.', 'new_csrf_token' => $_SESSION['csrf_token']]);
     exit;
 }
 
@@ -70,13 +83,25 @@ if (!$stmt->execute()) {
 $stmt->close();
 
 if ($action === 'approve') {
-    $stmt = $conn->prepare("
-        UPDATE Orders SET paymentStatus = 'refunded', orderStatus = 'cancelled'
-        WHERE orderId = ?
-    ");
-    $stmt->bind_param("i", $refund['orderId']);
-    $stmt->execute();
-    $stmt->close();
+    if ($refund['type'] === 'Refund') {
+        // Update order status
+        $stmt = $conn->prepare("
+            UPDATE Orders SET paymentStatus = 'refunded', orderStatus = 'cancelled'
+            WHERE orderId = ?
+        ");
+        $stmt->bind_param("i", $refund['orderId']);
+        $stmt->execute();
+        $stmt->close();
+    } else {
+        // Handle Enquiry/Feedback: Send Email
+        $recipientEmail = $refund['email'] ?: ($refund['reg_email'] ?? '');
+        $recipientName = $refund['name'] ?: (trim(($refund['fname'] ?? '') . ' ' . ($refund['lname'] ?? '')) ?: 'Valued Customer');
+        $subject = $refund['subject'] ?: $refund['type'];
+
+        if ($recipientEmail) {
+            sendAdminReplyEmail($recipientEmail, $subject, $adminNote, $recipientName);
+        }
+    }
 }
 
 echo json_encode(['success' => true, 'message' => 'Refund request ' . $newStatus . '.', 'new_csrf_token' => $_SESSION['csrf_token']]);

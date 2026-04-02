@@ -86,7 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $errorMsg .= "Cover image content does not match its extension.<br>";
                 } else {
                     // Save to genre-specific folder
-                    $uploadDir = '../assets/images/' . $genre . '/';
+                    $uploadBase = dirname(__DIR__) . '/assets/images/';
+                    $uploadDir  = $uploadBase . $genre . '/';
                     if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
                     
                     // Use sanitized original name instead of uniqid

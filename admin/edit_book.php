@@ -105,7 +105,8 @@ if (!isset($_GET['id']) || !filter_var($_GET['id'], FILTER_VALIDATE_INT, ['optio
                         $errorMsg .= "Cover image content does not match its extension.<br>";
                     } else {
                         // Save to genre-specific folder
-                        $uploadDir = '../assets/images/' . $genre . '/';
+                        $uploadBase = dirname(__DIR__) . '/assets/images/';
+                        $uploadDir  = $uploadBase . $genre . '/';
                         if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
                         // Use sanitized original name instead of uniqid
@@ -249,7 +250,7 @@ include '../inc/nav.php';
                 <?php if (!empty($book['cover_image'])): ?>
                 <div class="current-cover">
                     <img id="cover-preview"
-                         src="<?= htmlspecialchars('../' . $book['cover_image']) ?>"
+                         src="<?= htmlspecialchars($baseUrl . '/' . asset_url($book['cover_image'])) ?>"
                          alt="Current cover">
                     <p class="cover-caption">Current cover — upload a new file to replace</p>
                 </div>

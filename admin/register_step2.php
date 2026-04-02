@@ -2,7 +2,7 @@
 $pageTitle = "Admin Register";
 $extraCSS = ["../assets/css/login.css"];
 $extraJS = [
-    ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
+    // ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true], // reCAPTCHA disabled
     ["src" => "../assets/js/main.js", "defer" => true]
 ];
 include '../inc/conn.php'; 
@@ -67,7 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($success) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     } 
-    // Recaptcha
+    /*
+    // Recaptcha disabled for VM setup
     $recaptcha_secret = "6LdCK5wsAAAAAC12fTpTk88DcWeDc5niNbSWNbLd";
     $recaptcha_response = $_POST['g-recaptcha-response'];
     $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$recaptcha_secret}&response={$recaptcha_response}");
@@ -77,6 +78,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errorMsg[] = "Please complete the reCAPTCHA.";
     } 
     else {
+    */
+    if (true) {
         // If picture uploaded
         if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
             $checkMime = getimagesize($_FILES['profile_pic']['tmp_name']);
@@ -125,6 +128,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
     }
+}
+
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 
 function saveMemberToDB() {
@@ -198,7 +208,7 @@ function saveMemberToDB() {
                         <label class="form-label" for="profile_pic">Upload profile picture (JPG, PNG):</label>
                         <input class="form-control" type="file" id="profile_pic" name="profile_pic" accept="image/*">
                     </div>
-                    <div class="g-recaptcha text-center" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div>
+                    <!-- <div class="g-recaptcha text-center" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div> -->
                     <div class="mb-3 d-flex justify-content-between">
                         <a href="register_step1.php" class="btn btn-secondary">Back</a>
                         <button class="btn btn-success" type="submit">Register</button>

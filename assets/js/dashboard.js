@@ -24,12 +24,37 @@
         activeRefundId = data.refundId;
         previousFocus = btn;
 
-        document.getElementById('rp-username').textContent = data.username;
-        document.getElementById('rp-orderid').textContent = '#' + data.orderId;
-        document.getElementById('rp-amount').textContent = '$' + parseFloat(data.totalPrice).toFixed(2);
+        const typeLower = data.type.toLowerCase();
+        const isRefundType = typeLower === 'refund';
+        const isFeedbackType = typeLower === 'feedback';
+
+        // Reset visibility
+        document.querySelectorAll('.rp-only-refund').forEach(el => el.style.display = (isRefundType ? '' : 'none'));
+        document.querySelectorAll('.rp-only-enquiry').forEach(el => el.style.display = (!isRefundType ? '' : 'none'));
+        document.getElementById('rp-reject-btn').style.display = (isRefundType ? '' : 'none');
+
+        if (isRefundType) {
+            document.getElementById('rp-title').textContent = 'Refund Request';
+            document.getElementById('rp-username').textContent = data.username;
+            document.getElementById('rp-orderid').textContent = '#' + data.orderId;
+            document.getElementById('rp-amount').textContent = '$' + parseFloat(data.totalPrice).toFixed(2);
+            document.getElementById('rp-reason-label').textContent = "Customer's Reason";
+            document.getElementById('rp-approve-text').textContent = "Approve Refund";
+            document.getElementById('rp-note-label').innerHTML = 'Message to Customer <span class="rp-note-hint">(optional — visible on their Order History)</span>';
+        } else {
+            document.getElementById('rp-title').textContent = isFeedbackType ? 'User Feedback' : 'General Enquiry';
+            document.getElementById('rp-username').textContent = data.name || data.reg_username || 'Guest';
+            document.getElementById('rp-subject').textContent = data.subject || (isFeedbackType ? 'Feedback' : 'Enquiry');
+            document.getElementById('rp-reason-label').textContent = isFeedbackType ? "User's Feedback" : "Enquiry Message";
+            document.getElementById('rp-approve-text').textContent = "Send Reply";
+            document.getElementById('rp-note-label').innerHTML = 'Reply to User <span class="rp-note-hint">(will be sent to their email)</span>';
+        }
+
         document.getElementById('rp-reason').textContent = data.reason;
         document.getElementById('rp-note').value = '';
-        document.getElementById('rp-feedback').textContent = '';
+        const fb = document.getElementById('rp-feedback');
+        fb.textContent = '';
+        fb.className = 'rp-feedback';
 
         const d = new Date(data.created_at.replace(' ', 'T'));
         document.getElementById('rp-date').textContent =
@@ -101,30 +126,42 @@
             if (data.new_csrf_token) CSRF_TOKEN = data.new_csrf_token;
 
             if (data.success) {
-                feedback.textContent = action === 'approve'
-                    ? '✓ Refund approved. The order has been marked as refunded.'
-                    : '✓ Request rejected.';
+                const btnData = JSON.parse(previousFocus.dataset.refund);
+                const isRefund = btnData.type === 'Refund';
+
+                if (isRefund) {
+                    feedback.textContent = action === 'approve'
+                        ? '✓ Refund approved. The order has been marked as refunded.'
+                        : '✓ Request rejected.';
+                } else {
+                    feedback.textContent = action === 'approve'
+                        ? '✓ Reply sent successfully via email.'
+                        : '✓ Enquiry dismissed.';
+                }
                 feedback.classList.add('rp-feedback-success');
 
                 // Remove the resolved row from the list
-                document.querySelectorAll('.refund-row').forEach(r => {
-                    if (JSON.parse(r.dataset.refund).refundId == activeRefundId) r.remove();
-                });
+                previousFocus.closest('li').remove();
 
-                // If list is now empty, replace with the empty state
-                const remaining = document.querySelectorAll('.refund-row');
+                // Update badges and empty states
+                const listClass = isRefund ? '.refund-list-box' : '.enquiry-list-box';
+                const rowClass = isRefund ? '.refund-row:not(.enquiry-row)' : '.enquiry-row';
+                const badgeClass = isRefund ? '.count-badge:not(.enquiry-badge)' : '.enquiry-badge';
+                const emptyText = isRefund ? 'No refund requests at this time.' : 'No enquiries at this time.';
+
+                const remaining = document.querySelectorAll(rowClass);
                 if (remaining.length === 0) {
-                    const box = document.querySelector('.refund-list-box');
+                    const box = document.querySelector(listClass);
                     if (box) {
                         box.outerHTML =
                             '<div class="empty-state" role="status">' +
                             '<i class="bi bi-check-circle" style="font-size:1.8rem;color:var(--success);display:block;margin-bottom:8px" aria-hidden="true"></i>' +
-                            'No refund requests at this time.</div>';
+                            emptyText + '</div>';
                     }
-                    const badge = document.querySelector('.count-badge');
+                    const badge = document.querySelector(badgeClass);
                     if (badge) badge.remove();
                 } else {
-                    const badge = document.querySelector('.count-badge');
+                    const badge = document.querySelector(badgeClass);
                     if (badge) badge.textContent = remaining.length;
                 }
 
@@ -142,14 +179,4 @@
             rejectBtn.disabled = false;
         }
     };
-
-    //alert pop up
-    const alertBoxes = document.getElementsByClassName("alert");
-    for (let i = 0; i < alertBoxes.length; i++) {
-        const alertBox = alertBoxes[i];
-        setTimeout(() => {
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertBox);
-            bsAlert.close();
-        }, 3000); //close after 3 sec
-    }
 })();

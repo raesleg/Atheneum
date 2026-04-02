@@ -1,14 +1,19 @@
 <?php
-$pageTitle = "Admin Register";
-$extraCSS = ["../assets/css/login.css"];
+$pageTitle = "Register";
+$extraCSS = [
+    "../assets/css/login.css"
+];
 
-$extraJS = [["src" => "../assets/js/main.js", "defer" => true]];
+$extraJS = [
+    // ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
+    ["src" => "assets/js/main.js", "defer" => true]
+];
 include '../inc/conn.php'; 
 include '../inc/header.php';
 include "../inc/nav.php";
 
 if ($isLoggedIn) {
-    header("Location: ../index.php");
+    header("Location: index.php");
     exit();
 }
 //CSRF
@@ -22,34 +27,6 @@ if (isset($_SESSION['error'])) {
     $errorMsg = (array)$_SESSION['error'];
     unset($_SESSION['error']);
 }
-
-$adminRegData = $_SESSION['admin_reg_data'] ?? [];
-
-$username = htmlspecialchars($adminRegData['username'] ?? '');
-$email    = htmlspecialchars($adminRegData['email'] ?? '');
-$fname    = htmlspecialchars($adminRegData['fname'] ?? '');
-$lname    = htmlspecialchars($adminRegData['lname'] ?? '');
-
-// --- Rate Limiting ---
-if (!isset($_SESSION['login_attempts'])) {
-    $_SESSION['login_attempts'] = 0;
-    $_SESSION['first_attempt_time'] = time();
-}
-
-$maxAttempts = 5;        // Max login attempts
-$timeWindow = 60;       // 5 minutes in seconds
-
-// Reset counter after time window
-if (time() - $_SESSION['first_attempt_time'] > $timeWindow) {
-    $_SESSION['login_attempts'] = 0;
-    $_SESSION['first_attempt_time'] = time();
-}
-
-// Check if user is temporarily blocked
-if ($_SESSION['login_attempts'] >= $maxAttempts) {
-    die("Too many login attempts. Please try again after". $timeWindow/60 . "minutes.");
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $errorMsg[] = "Invalid request. Please reload the page and try again.";
@@ -100,22 +77,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $success = false;
     } 
     else {
-        // password validation
-        $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/';
         if ($_POST["pwd"] !== $_POST["pwd_confirm"]) {
             $errorMsg[] = "Passwords do not match.";
             $success = false;
-        } 
-        elseif (!preg_match($pattern, $_POST["pwd"])) {
-            $errorMsg[] = "Password must be at least 8 characters long and contain uppercase, lowercase, numbers.";
+        } elseif (strlen($_POST["pwd"]) < 8) {
+            $errorMsg[] = "Password must be at least 8 characters long.";
             $success = false;
-        } 
-        else {
+        } else {
             $pwd_hashed = password_hash($_POST["pwd"], PASSWORD_DEFAULT);
         }
     }
     if ($success) {
-        $_SESSION['admin_reg_data'] = [
+        $_SESSION['reg_data'] = [
             'username' => $username,
             'email' => $email,
             'fname' => $fname,
@@ -128,10 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 function sanitize_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
+    return htmlspecialchars(stripslashes(trim($data)));
 }
 ?>
 
@@ -150,22 +120,22 @@ function sanitize_input($data) {
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     <div class="mb-3">
                         <label class="form-label" for="username">Username:</label>
-                        <input required maxlength="45" class="form-control" type="text" id="username" name="username" placeholder="Enter username" value="<?= $username ?>">
+                        <input required maxlength="45" class="form-control" type="text" id="username" name="username" placeholder="Enter username">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="email">Email:</label>
                         <input required maxlength="45" class="form-control" type="email" id="email" name="email"
-                        placeholder="Enter email" value="<?= $email ?>">
+                        placeholder="Enter email">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="fname">First name:</label>
                         <input maxlength="45" class="form-control" type="text" id="fname" name="fname"
-                        placeholder="Enter first name" value="<?= $fname ?>">
+                        placeholder="Enter first name">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="lname">Last name:</label>
                         <input required maxlength="45" class="form-control" type="text" id="lname" name="lname"
-                        placeholder="Enter last name" value="<?= $lname ?>">
+                        placeholder="Enter last name">
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="pwd">Password:</label>
