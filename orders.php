@@ -54,7 +54,10 @@ $stmt->close();
                     $statusClass = $isRefunded ? 'refunded' : str_replace('_', '-', $order['shipmentStatus'] ?? 'order-placed');
                     $statusIdx   = array_search($order['shipmentStatus'] ?? 'order_placed', $STATUS_ORDER);
                     ?>
-                    <div class="order-card" role="listitem" aria-label="Order #<?= $order['orderId'] ?>, <?= htmlspecialchars($statusLabel) ?>, total $<?= number_format($order['totalPrice'], 2) ?>">
+                    <div class="order-card" role="listitem"
+                        data-order-id="<?= $order['orderId'] ?>"
+                        data-shipment-status="<?= htmlspecialchars($order['shipmentStatus'] ?? 'order_placed') ?>"
+                        aria-label="Order #<?= $order['orderId'] ?>, <?= htmlspecialchars($statusLabel) ?>, total $<?= number_format($order['totalPrice'], 2) ?>">
                         <div class="order-card-header">
                             <div>
                                 <span class="order-id">Order #<?= $order['orderId'] ?></span>
@@ -106,5 +109,12 @@ $stmt->close();
         <?php endif; ?>
     </div>
 </main>
+
+<script>
+    window.ORDERS_LIST_CONFIG = {
+        statusOrder: <?= json_encode($STATUS_ORDER) ?>,
+        statusLabels: <?= json_encode($STATUS_LABELS) ?>
+    };
+</script>
 
 <?php include 'inc/footer.php'; ?>
