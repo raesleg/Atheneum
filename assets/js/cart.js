@@ -154,6 +154,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const activate = () => {
                 selectedAddressId = parseInt(btn.dataset.id, 10);
 
+                addrCards.querySelectorAll('.addr-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+
                 addrCards.querySelectorAll('.addr-card-select').forEach(cardBtn => {
                     cardBtn.setAttribute('aria-pressed', 'false');
                 });
