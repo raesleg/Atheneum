@@ -3,7 +3,8 @@ $pageTitle = "Admin Register";
 $extraCSS = ["../assets/css/login.css"];
 $extraJS = [
     ["src" => "https://www.google.com/recaptcha/api.js", "async" => true, "defer" => true],
-    ["src" => "../assets/js/main.js", "defer" => true]
+    ["src" => "../assets/js/main.js", "defer" => true],
+    ["src" => "assets/js/user.js", "defer" => true]
 ];
 include '../inc/conn.php'; 
 include '../inc/header.php';
@@ -219,12 +220,19 @@ function saveMemberToDB() {
             <form method="post"  enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div id="step2">
-                    <div class="mb-3 text-center">
-                        <img id="imgPreview" src="../assets/images/default-avatar.jpg" alt="Profile Preview">
+                    <div class="mb-3 text-center profile-update">
+                        <div id="avatarPlaceholder" style="width:100px;height:100px;border-radius:50%;background:var(--bg);border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                            <i class="bi bi-person" style="font-size:2.5rem;color:var(--muted);"></i>
+                        </div>
+                        <img id="imgPreview" src="" alt="Profile Preview"
+                             style="display:none;width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto;">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="profile_pic">Upload profile picture (JPG, PNG):</label>
-                        <input class="form-control" type="file" id="profile_pic" name="profile_pic" accept="image/*">
+                        <label class="form-label" for="profile_pic">
+                            Profile Photo <span style="color:var(--muted);font-weight:400;">(optional)</span>
+                        </label>
+                        <input class="form-control" type="file" id="profile_pic" name="profile_pic" accept="image/jpeg,image/png">
+                        <p style="font-size:0.75rem;color:var(--muted);margin-top:4px;">JPG or PNG, max 2MB. Leave blank to use the default avatar.</p>
                     </div>
                     <div class="g-recaptcha text-center" data-sitekey="6LdCK5wsAAAAAF-um6W9E8AJCCQh8rLHjr2F9gkF"></div>
                     <div class="mb-3 d-flex justify-content-between">

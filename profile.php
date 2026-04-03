@@ -1,7 +1,8 @@
 <?php
 $pageTitle = "Profile";
 $extraCSS = ["assets/css/profile.css"];
-$extraJS = [["src" => "assets/js/main.js", "defer" => true]];
+$extraJS = [["src" => "assets/js/main.js", "defer" => true],
+            ["src" => "assets/js/user.js", "defer" => true]];
 include 'inc/conn.php';
 include 'inc/header.php';
 
@@ -32,9 +33,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-    $fname = sanitize_input($_POST['fname']);
-    $lname = sanitize_input($_POST['lname']);
-    $email = sanitize_input($_POST['email']);
+    if (!empty($_POST["fname"])) {
+        $fname = sanitize_input($_POST["fname"]);
+        if (!preg_match("/^[A-Za-z\s'-]{1,45}$/", $fname)) {
+            $errorMsg[] = "Invalid first name format.";
+            $success = false;
+        }
+    }
+    if (empty($_POST["lname"])) {
+        $errorMsg[] = "Last name is required.";
+        $success = false;
+    } 
+    else {
+        $lname = sanitize_input($_POST["lname"]);
+        if (!preg_match("/^[A-Za-z\s'-]{1,45}$/", $lname)) {
+            $errorMsg[] = "Invalid last name format.";
+            $success = false;
+        }
+    }
+    if (empty($_POST["email"])) {
+        $errorMsg[] = "Email is required.";
+        $success = false;
+    } else {
+        $email = sanitize_input($_POST["email"]);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errorMsg[] = "Invalid email format.";
+            $success = false;
+        }
+    }
 
     // file details
     $fileError = $_FILES['profile_pic']['error'];
@@ -163,7 +189,7 @@ $stmt->close();
             </div>
             <div class="profile-details">
                 <div class="mb-3 text-center">
-                    <img id="profileImg" src="<?= htmlspecialchars($profilePic) ?>" alt="Profile Picture">
+                    <img id="profileImg" src="<?= htmlspecialchars($profilePic) ?>" data-original="<?= htmlspecialchars($profilePic) ?>" alt="Profile Picture">
                 </div>
                 <div class="mb-3">
                     <label for="profile_pic">Profile Picture</label>
