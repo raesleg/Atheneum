@@ -17,6 +17,9 @@ function getDBConnection() {
         die("Connection failed: " . $conn->connect_error);
     }
 
+    // Use '+08:00' for Singapore/Perth/Malaysia, or your specific offset
+    $conn->query("SET time_zone = '+08:00'");
+
     return $conn;
 }
 ?>
