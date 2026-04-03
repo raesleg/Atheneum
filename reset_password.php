@@ -55,9 +55,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
 
         // create reset link
-        $link = "http://localhost:8000/new_password.php?token=" . $token;
+        $link = $baseUrl . "/new_password.php?token=" . $token;
+        $htmlContent = "
+        <html>
+        <head>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap');
+                .email-container { font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 20px auto; border: 1px solid #e1e4e8; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                .header { background-color: #1a2c5b; padding: 30px; text-align: center; }
+                .header h1 { margin: 0; font-family: 'Playfair Display', 'Georgia', serif; color: #ffffff; font-size: 32px; font-weight: 600; letter-spacing: 3px;}
+                .content { padding: 40px; background: #fff; }
+                .footer { padding: 25px; text-align: center; font-size: 13px; color: #777; background: #f9f9f9; border-top: 1px solid #eee; }
+                hr { border: none; border-top: 1px solid #eee; margin: 25px 0; }
+            </style>
+        </head>
+        <body style='background:#f6f6f6; padding:40px 0; margin:0;'>
+            <div class='email-container'>
+                <div class='header'>
+                    <h1 style='margin: 0; font-family: \"Playfair Display\", serif; color: #ffffff; font-size: 28px; letter-spacing: 2px;'>Atheneum</h1>
+                </div>
+                <div class='content'>
+                    <p style='font-size: 18px; font-weight: 500;'>Hello</p>
+                    <div style='white-space: pre-wrap; font-size: 15px; color: #444;'>Please click here to reset your password \n" . $link . " </div>
+                    <hr>
+                    <p style='font-size: 14px;'>If you didn't make this request, just ignore this email.</p>
+                    <p>Best Regards,<br><strong>Atheneum Support Team</strong></p>
+                </div>
+                <div class='footer'>
+                    <p style='margin: 0;'>&copy; 2026 Atheneum Book Store, PTE LTD. All rights reserved.</p>
+                    <p style='margin-top: 6px; font-size: 11px; color: #aaa; opacity: 0.6;'>Reference: AT-" . date('YmdHis') . "</p>
+                </div>
+            </div>
+        </body>
+        </html>";
 
-        if (sendEmail($email, $link)) {
+        if (sendEmail($email, $htmlContent)) {
             $_SESSION['alert'] = "If this email exists, a reset link has been sent.";
             $success=true;
             
@@ -73,28 +105,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 
-function sendEmail($to, $link) {
+function sendEmail($to, $htmlContent) {
     $mail = new PHPMailer(true);
     try{
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        // $mail->Host = 'sandbox.smtp.mailtrap.io';
+        $mail->Host = 'smtp.gmail.com'; 
         $mail->SMTPAuth = true;
-        // $mail->Username = '2327ad7a4371df';
-        // $mail->Password = '834865c96d87bf';
         // Use gmail to send real email
         $mail->Username = 'cc.snapx@gmail.com';
         $mail->Password = 'hzaf xnwh ssoi iowb';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         $mail->Timeout = 10;
-        $mail->isHTML(false);
+        $mail->isHTML(true);
 
         $mail->setFrom('no-reply@atheneum.com', 'Atheneum');
         $mail->addAddress($to);
 
         $mail->Subject = 'Password Reset';
-        $mail->Body = "Click here to reset your password: \n$link";
+        $mail->Body = $htmlContent;
         return $mail->send();
     } 
     catch (Exception $e) {
